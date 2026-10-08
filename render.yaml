@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: lamp-packing-system
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --workers 2 --timeout 120
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: SUPABASE_DB_URL
+        value: postgresql://postgres.wwqijexgkicowmzvwqvy:KOCH-LAMP123@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres
+      - key: DATABASE_URL
+        value: postgresql://postgres.wwqijexgkicowmzvwqvy:KOCH-LAMP123@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres
+      - key: PYTHON_VERSION
+        value: 3.11.9

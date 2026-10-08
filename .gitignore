@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.env.local
+
+# Local Database & Exports (Cloud uses Supabase)
+*.db
+lamp_data.db
+lamp_production.db
+lamp_system.db
+lamp_system_backup_all_history.db
+supabase_export/
+scratch/
+
+# Local SSL & Binaries
+cloudflared.exe
+*.pem
+
+# Generated Excel outputs (keep templates and master data)
+Delivery trip sheet for lamp_*.xlsx
+DeliveryTripSheet_Lamp_*.xlsx
+DN_DeliveryNote_*.xlsx
+Package_Labels_Rack_*.xlsx
+
+# Master Data Excel Files (KEEP THESE IN REPO):
+# !Part Number.xlsx
+# !View Bom.xlsx
+# !Receive History.xlsx
+# !Pack Plan Summary.xlsx
+# !5. Delivery trip sheet for lamp.xlsx
