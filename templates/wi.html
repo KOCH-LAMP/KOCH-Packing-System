@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>คู่มือการปฏิบัติงาน (Work Instruction) - LAMP Packing System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Sarabun', sans-serif; }
+    font-mono, code { font-family: 'JetBrains Mono', monospace; }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white !important; color: black !important; }
+      .page-break { page-break-before: always; }
+      .shadow-sm, .shadow-md, .shadow-lg, .shadow-xl { box-shadow: none !important; }
+      .border { border-color: #cbd5e1 !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen">
+
+  <!-- Floating Sticky Action Bar (Screen Only) -->
+  <div class="no-print sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 text-white py-2.5 px-4 shadow-lg">
+    <div class="max-w-5xl mx-auto flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <a href="/" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 shadow-sm">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>กลับสู่หน้าหลัก</span>
+        </a>
+        <span class="text-xs sm:text-sm text-slate-300 font-medium hidden sm:inline">| เอกสารคู่มือมาตรฐาน WI-LAMP-PK-001 (Rev. 03)</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="window.print()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 shadow-sm">
+          <i class="fa-solid fa-print"></i>
+          <span>พิมพ์เอกสาร (Print / PDF)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Document Container -->
+  <div class="max-w-5xl mx-auto p-4 sm:p-8 space-y-6">
+
+    <!-- Document Header / Approval Block -->
+    <div class="bg-white rounded-2xl border-2 border-slate-300 p-5 sm:p-7 shadow-sm">
+      <div class="flex flex-col sm:flex-row items-center justify-between pb-5 border-b-2 border-slate-200 gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center text-2xl font-bold shadow-md">
+            <i class="fa-solid fa-barcode"></i>
+          </div>
+          <div>
+            <span class="text-xs font-bold text-blue-600 uppercase tracking-wider block">Standard Work Instruction (SOP / WI)</span>
+            <h1 class="text-xl sm:text-2xl font-black text-slate-900 leading-tight">คู่มือการปฏิบัติงานระบบ LAMP Packing System</h1>
+            <p class="text-xs text-slate-500">ระบบสแกนรับ ตรวจสอบการแพ็ค จัดการ Rack และออกเอกสารส่งมอบ (Web & Mobile 24H)</p>
+          </div>
+        </div>
+        <div class="text-xs text-right border-t sm:border-t-0 sm:border-l-2 border-slate-200 pt-3 sm:pt-0 sm:pl-5 space-y-1">
+          <p><strong class="text-slate-700">รหัสเอกสาร:</strong> <span class="font-mono font-bold text-blue-700">WI-LAMP-PK-001</span></p>
+          <p><strong class="text-slate-700">ฉบับปรับปรุง:</strong> <span class="text-emerald-700 font-bold">Rev. 03 (Complete Edition 2026)</span></p>
+          <p><strong class="text-slate-700">วันที่มีผลบังคับใช้:</strong> 09 ตุลาคม 2026</p>
+          <p><strong class="text-slate-700">แผนก:</strong> ผลิต, คลังสินค้า, QA/QC, จัดส่ง</p>
+        </div>
+      </div>
+
+      <!-- Quick Nav Strip -->
+      <div class="no-print mt-4 pt-3 flex flex-wrap gap-2 text-xs">
+        <span class="font-bold text-slate-500 flex items-center mr-1">ไปที่หัวข้อ:</span>
+        <a href="#sec-overview" class="px-2.5 py-1 bg-slate-100 hover:bg-blue-100 text-slate-700 rounded transition font-medium">1. ภาพรวมระบบ</a>
+        <a href="#sec-connect" class="px-2.5 py-1 bg-slate-100 hover:bg-blue-100 text-slate-700 rounded transition font-medium">2. เชื่อมต่อ & PWA</a>
+        <a href="#sec-posearch" class="px-2.5 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded transition font-bold">3. กรอง & ค้นหา PO</a>
+        <a href="#sec-tab1" class="px-2.5 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded transition font-bold">4. สแกนแพ็ค FG (Tag 2 & Rack)</a>
+        <a href="#sec-tab2" class="px-2.5 py-1 bg-sky-100 hover:bg-sky-200 text-sky-900 rounded transition font-bold">5. สแกนรับเข้า (Tag 1 & Wait PO)</a>
+        <a href="#sec-tab3" class="px-2.5 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-900 rounded transition font-bold">6. ตรวจสอบยอด & สรุป Rack</a>
+        <a href="#sec-tab4" class="px-2.5 py-1 bg-purple-100 hover:bg-purple-200 text-purple-900 rounded transition font-medium">7. กล่อง Carton (BOM)</a>
+        <a href="#sec-tab5" class="px-2.5 py-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-900 rounded transition font-bold">8. ออกเอกสาร: Tag Rack / Trip Sheet / DN</a>
+        <a href="#sec-sync" class="px-2.5 py-1 bg-teal-100 hover:bg-teal-200 text-teal-900 rounded transition font-bold">9. ซิงค์ WMS & Plan Production</a>
+        <a href="#sec-trouble" class="px-2.5 py-1 bg-rose-100 hover:bg-rose-200 text-rose-900 rounded transition font-bold">10. การแก้ไขปัญหา</a>
+        <a href="#sec-control24" class="px-2.5 py-1 bg-slate-800 text-slate-200 rounded transition font-medium">11. การดูแลระบบ 24 ชม.</a>
+      </div>
+    </div>
+
+    <!-- Section 1: วัตถุประสงค์และอุปกรณ์ -->
+    <div id="sec-overview" class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-7 shadow-sm space-y-4">
+      <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2 pb-2 border-b border-slate-100">
+        <span class="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-bold">1</span>
+        <span>วัตถุประสงค์และอุปกรณ์การปฏิบัติงาน (Purpose & Equipment)</span>
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
+        <div class="bg-blue-50/70 p-3.5 rounded-xl border border-blue-200 space-y-2">
+          <h3 class="font-bold text-blue-900 flex items-center gap-1.5">
+            <i class="fa-solid fa-bullseye text-blue-600"></i>
+            <span>วัตถุประสงค์ (Purpose)</span>
+          </h3>
+          <ul class="list-disc list-inside space-y-1 text-slate-700">
+            <li>ป้องกันการแพ็คสินค้าผิดรุ่น ผิดจำนวน และผิดกล่อง (Poka-Yoke 100%)</li>
+            <li>ติดตามสถานะ Inbound รับเข้า และ Outbound แพ็คส่งมอบแบบเรียลไทม์</li>
+            <li>ควบคุมและตรวจสอบการจัดเรียงชิ้นส่วนลงในแต่ละ Rack อย่างแม่นยำ</li>
+            <li>ออกเอกสารส่งมอบครบวงจร: Tag ติด Rack, DeliveryTripSheet Lamp (ชุด 2 ฉบับ) และ Delivery Note (DN)</li>
+            <li>รองรับการใช้งานผ่านมือถือ แท็บเล็ต และคอมพิวเตอร์ตลอด 24 ชั่วโมง</li>
+          </ul>
+        </div>
+
+        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+          <h3 class="font-bold text-slate-900 flex items-center gap-1.5">
+            <i class="fa-solid fa-toolbox text-slate-600"></i>
+            <span>เครื่องมือและอุปกรณ์ (Equipment)</span>
+          </h3>
+          <ul class="list-disc list-inside space-y-1 text-slate-700">
+            <li><strong>สมาร์ตโฟน / แท็บเล็ต:</strong> สแกนผ่านกล้องสด หรือถ่ายภาพ PWA App</li>
+            <li><strong>ปืนสแกนบาร์โค้ด (Barcode Gun):</strong> ทั้งแบบ USB และ Bluetooth ไร้สาย</li>
+            <li><strong>คอมพิวเตอร์แม่ข่าย (Host PC):</strong> เซิร์ฟเวอร์ Waitress 24 ชั่วโมง</li>
+            <li><strong>เครื่องพิมพ์ (Printer):</strong> พิมพ์ Tag ติด Rack, Trip Sheet และ DN</li>
+            <li><strong>ระบบเครือข่าย:</strong> Wi-Fi โรงงาน (192.168.1.148) และ HTTPS Cloudflare</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: การเชื่อมต่อระบบและติดตั้งแอปลงบนมือถือ -->
+    <div id="sec-connect" class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-7 shadow-sm space-y-4">
+      <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2 pb-2 border-b border-slate-100">
+        <span class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold">2</span>
+        <span>การเชื่อมต่อระบบและติดตั้งแอปลงบนมือถือ (Connection & PWA Installation)</span>
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs sm:text-sm">
+        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+          <h4 class="font-bold text-slate-800 flex items-center gap-1.5">
+            <i class="fa-solid fa-desktop text-blue-600"></i>
+            <span>คอมพิวเตอร์โรงงาน</span>
+          </h4>
+          <p class="text-slate-600">เปิด Google Chrome หรือ Edge เข้าใช้งานที่ลิงก์:</p>
+          <code class="block bg-white p-2 rounded border border-slate-200 font-mono text-blue-700 font-bold text-center">http://127.0.0.1:5050</code>
+        </div>
+
+        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+          <h4 class="font-bold text-slate-800 flex items-center gap-1.5">
+            <i class="fa-solid fa-wifi text-emerald-600"></i>
+            <span>มือถือผ่าน Wi-Fi โรงงาน</span>
+          </h4>
+          <p class="text-slate-600">ต่อ Wi-Fi โรงงานวงเดียวกัน แล้วพิมพ์ URL ในเบราว์เซอร์:</p>
+          <code class="block bg-white p-2 rounded border border-slate-200 font-mono text-emerald-700 font-bold text-center">http://192.168.1.148:5050</code>
+        </div>
+
+        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+          <h4 class="font-bold text-slate-800 flex items-center gap-1.5">
+            <i class="fa-solid fa-qrcode text-purple-600"></i>
+            <span>สแกน QR Code มือถือ</span>
+          </h4>
+          <p class="text-slate-600">กดปุ่ม <strong>"เปิดในมือถือ"</strong> ที่แถบเมนูด้านบน แล้วใช้กล้องมือถือสแกนเพื่อเข้าใช้งานทันที</p>
+        </div>
+      </div>
+      <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs sm:text-sm text-emerald-900 flex items-center gap-2">
+        <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i>
+        <span><strong>การติดตั้ง App:</strong> บนมือถือให้กดปุ่ม <strong>"ติดตั้ง App"</strong> สีเขียวกะพริบที่แถบเมนูด้านบน เพื่อเพิ่มไอคอนแอปลงบนหน้าจอหลัก เปิดใช้งานแบบเต็มจอได้เหมือนแอปแท้</span>
+      </div>
+    </div>
+
+    <!-- Section 3: การค้นหา กรองสถานะ และเลือกเลขที่ PO -->
+    <div id="sec-posearch" class="bg-white rounded-2xl border-2 border-amber-300 p-5 sm:p-7 shadow-sm space-y-4">
+      <div class="flex items-center justify-between pb-2 border-b border-amber-200">
+        <h2 class="text-lg font-bold text-amber-950 flex items-center gap-2">
+          <span class="w-7 h-7 rounded-lg bg-amber-500 text-white flex items-center justify-center text-sm font-bold">3</span>
+          <span>การค้นหา กรองสถานะ Complete/Pending และเลือกเลขที่ PO (PO Workflow)</span>
+        </h2>
+        <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-300">อัปเดตใหม่ Rev. 03</span>
+      </div>
+      <p class="text-xs sm:text-sm text-slate-600">ระบบมีรายการ PO สะสมจำนวนมาก จึงมีฟังก์ชันตรวจสอบสถานะความสมบูรณ์และตัวกรองอัจฉริยะ เพื่อช่วยให้เห็นเฉพาะ PO ที่ยังมีงานค้างอยู่:</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
+        <div class="p-3.5 bg-amber-50/70 rounded-xl border border-amber-200 space-y-2">
+          <h4 class="font-bold text-amber-900 flex items-center gap-1.5">
+            <i class="fa-solid fa-filter text-amber-600"></i>
+            <span>1. ปุ่มสลับตัวกรอง PO ค้างแพ็ค (Header Fast Filter Toggle)</span>
+          </h4>
+          <p class="text-slate-700 leading-relaxed">
+            มีปุ่มทางลัดข้างช่องเลือก PO บน Header สามารถกดสลับระหว่าง:
+          </p>
+          <ul class="list-disc list-inside space-y-1 text-slate-700 pl-2">
+            <li><strong>`⏳ ค้างแพ็ค (ซ่อน Complete)`:</strong> กรองเอา PO ที่แพ็คเสร็จครบ 100% แล้วออก เพื่อให้เห็นเฉพาะ PO ที่กำลังดำเนินการอยู่</li>
+            <li><strong>`📋 ทุก PO`:</strong> แสดง PO ทุกรายการทั้งหมดในระบบ</li>
+          </ul>
+          <p class="text-[11px] text-amber-800 italic mt-1">* ระบบจะจดจำค่าตัวกรองที่เลือกไว้ในอุปกรณ์ของผู้ใช้โดยอัตโนมัติ</p>
+        </div>
+
+        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+          <h4 class="font-bold text-slate-800 flex items-center gap-1.5">
+            <i class="fa-solid fa-list-check text-blue-600"></i>
+            <span>2. การจัดกลุ่มใน Dropdown (`#poSelect`)</span>
+          </h4>
+          <p class="text-slate-700 leading-relaxed">
+            รายการใน Dropdown ถูกจัดกลุ่มอย่างเป็นระเบียบด้วย <code>&lt;optgroup&gt;</code>:
+          </p>
+          <ul class="list-disc list-inside space-y-1 text-slate-700 pl-2">
+            <li><strong>กลุ่ม `⏳ ค้างแพ็ค (กำลังดำเนินการ)`:</strong> แสดง PO ที่มียอดค้าง พร้อมป้าย <span class="bg-amber-100 text-amber-800 px-1 rounded font-bold">[Pending]</span> และยอดชิ้นงานที่ค้าง</li>
+            <li><strong>กลุ่ม `✅ แพ็คครบแล้ว (Complete)`:</strong> แสดง PO ที่แพ็คครบถ้วน 100% แล้ว พร้อมป้าย <span class="bg-emerald-100 text-emerald-800 px-1 rounded font-bold">[Complete]</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="p-3.5 bg-blue-50/70 rounded-xl border border-blue-200 space-y-2 text-xs sm:text-sm">
+        <h4 class="font-bold text-blue-950 flex items-center gap-1.5">
+          <i class="fa-solid fa-magnifying-glass text-blue-600"></i>
+          <span>3. หน้าต่างค้นหา PO ขั้นสูง (Search PO Modal)</span>
+        </h4>
+        <p class="text-slate-700">คลิกที่ปุ่ม <strong>[🔍 ค้นหา]</strong> สีเหลืองบน Header หรือป้าย PO ในหน้าสแกนแพ็ค จะเปิดหน้าต่างค้นหาด่วนที่มีปุ่มตัวกรองสถานะ:</p>
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1 text-center font-bold text-xs">
+          <div class="p-2 rounded bg-white border border-slate-300 text-slate-700">ทั้งหมด</div>
+          <div class="p-2 rounded bg-amber-100 border border-amber-300 text-amber-900">⏳ ค้างแพ็ค</div>
+          <div class="p-2 rounded bg-blue-100 border border-blue-300 text-blue-900">⚡ กำลังแพ็ค</div>
+          <div class="p-2 rounded bg-emerald-100 border border-emerald-300 text-emerald-900">✅ ครบแล้ว</div>
+          <div class="p-2 rounded bg-yellow-100 border border-yellow-300 text-yellow-900">⏳ Wait PO</div>
+        </div>
+        <p class="text-slate-600 text-xs mt-1">แต่ละรายการแสดง Progress Bar เปอร์เซ็นต์ความคืบหน้า ยอดรับเข้า ยอดแพ็ค และยอดคงเหลือครบถ้วน</p>
+      </div>
+    </div>
+
+    <!-- Section 4: สแกนเช็คการ Pack (Tag รูปที่ 2) -->
+    <div id="sec-tab1" class="page-break bg-white rounded-2xl border-2 border-amber-300 p-5 sm:p-7 shadow-sm space-y-4">
+      <div class="flex items-center justify-between pb-2 border-b border-amber-200">
+        <h2 class="text-lg font-bold text-amber-950 flex items-center gap-2">
+          <span class="w-7 h-7 rounded-lg bg-amber-500 text-white flex items-center justify-center text-sm font-bold">4</span>
+          <span>ขั้นตอนการสแกนเช็คการ Pack FG (แท็บที่ 1: Tag รูปที่ 2 - Mazda)</span>
+        </h2>
+        <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-300">1 Scan = 1 Qty</span>
+      </div>
+
+      <!-- Tag 2 Visual Image -->
+      <div class="bg-amber-50/50 p-3 rounded-xl border border-amber-200 text-center">
+        <img src="/static/images/tag_sample_pack.jpg" alt="Tag รูปที่ 2 (Mazda)" class="max-h-[300px] mx-auto rounded-lg shadow border border-amber-300">
+        <p class="text-xs text-amber-800 mt-2 font-medium">รูปที่ 1: แผนผังแสดงจุดมาร์คสแกนบน Tag รูปที่ 2 (Mazda Genuine Parts)</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs sm:text-sm">
+        <div class="p-3 bg-rose-50 rounded-xl border border-rose-200 space-y-1.5">
+          <div class="flex items-center gap-2 font-bold text-rose-900">
+            <span class="w-5 h-5 rounded-full bg-rose-600 text-white flex items-center justify-center text-xs">1</span>
+            <span>จุดสแกนที่ 1: บาร์โค้ด Part No.</span>
+          </div>
+          <p class="text-slate-700">สแกนบาร์โค้ด <code class="bg-white px-1 py-0.5 rounded text-rose-700 font-bold font-mono">DB7A513G0CZ</code> เพื่อตรวจสอบความถูกต้องกับ PO และตัดยอดแพ็คครั้งละ 1 ชิ้น</p>
+        </div>
+
+        <div class="p-3 bg-purple-50 rounded-xl border border-purple-200 space-y-1.5">
+          <div class="flex items-center gap-2 font-bold text-purple-900">
+            <span class="w-5 h-5 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs">2</span>
+            <span>จุดสแกนที่ 2: บาร์โค้ดกล่อง Carton</span>
+          </div>
+          <p class="text-slate-700">สแกนบาร์โค้ดกล่อง <code class="bg-white px-1 py-0.5 rounded text-purple-700 font-bold font-mono">C302515A07</code> เพื่อตรวจเช็คขนาดกล่องให้ตรงกับ BOM (เว้นว่างได้ถ้าล็อคกล่องไว้แล้ว)</p>
+        </div>
+
+        <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 space-y-1.5">
+          <div class="flex items-center gap-2 font-bold text-amber-900">
+            <span class="w-5 h-5 rounded-full bg-amber-600 text-white flex items-center justify-center text-xs">3</span>
+            <span>ระบุหมายเลข Rack (Rack No.)</span>
+          </div>
+          <p class="text-slate-700">ระบุหมายเลข Rack ที่นำสินค้าไปวาง เช่น <code class="bg-white px-1 py-0.5 rounded text-amber-800 font-bold font-mono">170</code> หรือ <code class="bg-white px-1 py-0.5 rounded text-amber-800 font-bold font-mono">364</code> ระบบจะจำหมายเลข Rack ล่าสุดไว้ให้</p>
+        </div>
+      </div>
+
+      <!-- Result Banner Notice -->
+      <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-300 text-xs sm:text-sm text-emerald-950 space-y-1">
+        <h4 class="font-bold text-emerald-900 flex items-center gap-1.5">
+          <i class="fa-solid fa-eye text-emerald-600"></i>
+          <span>ป้ายแจ้งเตือนผลการสแกนบนตัวอย่าง Tag (Overlay Banner):</span>
+        </h4>
+        <p class="leading-relaxed">
+          ผลการสแกน (ผ่าน 🟢 / เตือน 🟡 / ผิดพลาด 🔴) จะแสดงอยู่ด้านบนรูปตัวอย่าง Tag โดยตรง ทำให้ผู้สแกนตรวจสอบความถูกต้องของ Part, Kanban และจำนวนได้ทันทีในจุดเดียว
+        </p>
+      </div>
+
+      <!-- Poka-Yoke Table -->
+      <h3 class="font-bold text-slate-900 text-xs sm:text-sm pt-1">ตารางการแจ้งเตือนและการป้องกันข้อผิดพลาด (Poka-Yoke):</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs text-left border border-slate-200 rounded-lg overflow-hidden">
+          <thead class="bg-slate-100 text-slate-700 font-bold">
+            <tr>
+              <th class="p-2.5 border-b">สถานการณ์</th>
+              <th class="p-2.5 border-b text-center">สัญญาณเตือน</th>
+              <th class="p-2.5 border-b">ข้อความแสดงผล</th>
+              <th class="p-2.5 border-b">การปฏิบัติของพนักงาน</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr>
+              <td class="p-2.5 font-semibold text-slate-800">Part ถูกต้องและมียอดคงเหลือ</td>
+              <td class="p-2.5 text-center"><span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">🟢 ผ่าน (PASS)</span></td>
+              <td class="p-2.5 text-emerald-700">สแกนสำเร็จ + บันทึกลง Rack เรียบร้อย</td>
+              <td class="p-2.5">บรรจุชิ้นส่วนลงกล่อง แล้วจัดเรียงลง Rack ตามหมายเลข</td>
+            </tr>
+            <tr>
+              <td class="p-2.5 font-semibold text-slate-800">Part ไม่ตรงกับ PO ที่เลือก</td>
+              <td class="p-2.5 text-center"><span class="px-2 py-0.5 rounded bg-rose-100 text-rose-800 font-bold">🔴 ผิดพลาด (ERROR)</span></td>
+              <td class="p-2.5 text-rose-700">Part No ไม่ตรงกับ PO หรือไม่มีในใบสั่งซื้อ</td>
+              <td class="p-2.5 font-bold text-rose-700">ห้ามบรรจุลงกล่อง! ตรวจสอบ Tag ว่าหยิบผิดรุ่นหรือไม่</td>
+            </tr>
+            <tr>
+              <td class="p-2.5 font-semibold text-slate-800">Part นี้แพ็คครบตามยอดแล้ว</td>
+              <td class="p-2.5 text-center"><span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">⚠️ แจ้งเตือน (OVER-PACK)</span></td>
+              <td class="p-2.5 text-amber-700">รายการนี้แพ็คครบถ้วน 100% แล้ว</td>
+              <td class="p-2.5">ตรวจสอบจำนวนชิ้นงานในกล่อง ปิดผนึกกล่อง ห้ามสแกนซ้ำ</td>
+            </tr>
+            <tr>
+              <td class="p-2.5 font-semibold text-slate-800">บาร์โค้ดกล่องไม่ตรง BOM</td>
+              <td class="p-2.5 text-center"><span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">⚠️ แจ้งเตือน (BOX MISMATCH)</span></td>
+              <td class="p-2.5 text-amber-700">ขนาดกล่องไม่ตรงกับข้อกำหนดใน BOM</td>
+              <td class="p-2.5">เปลี่ยนกล่อง Carton ให้ตรงตามขนาดที่กำหนด</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Section 5: สแกนรับ Part (Tag รูปที่ 1) -->
+    <div id="sec-tab2" class="page-break bg-white rounded-2xl border-2 border-sky-300 p-5 sm:p-7 shadow-sm space-y-4">
+      <div class="flex items-center justify-between pb-2 border-b border-sky-200">
+        <h2 class="text-lg font-bold text-sky-950 flex items-center gap-2">
+          <span class="w-7 h-7 rounded-lg bg-sky-600 text-white flex items-center justify-center text-sm font-bold">5</span>
+          <span>ขั้นตอนการสแกนรับเข้าชิ้นส่วน (แท็บที่ 2: Tag รูปที่ 1 - Thai Koito)</span>
+        </h2>
+        <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-sky-100 text-sky-800 border border-sky-300">Inbound Receiving</span>
+      </div>
+
+      <!-- Tag 1 Visual Image -->
+      <div class="bg-sky-50/50 p-3 rounded-xl border border-sky-200 text-center">
+        <img src="/static/images/tag_sample_receive.jpg" alt="Tag รูปที่ 1 (Thai Koito)" class="max-h-[300px] mx-auto rounded-lg shadow border border-sky-300">
+        <p class="text-xs text-sky-800 mt-2 font-medium">รูปที่ 2: แผนผังแสดงจุดมาร์คสแกนบน Tag รูปที่ 1 (Thai Koito Parts)</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
+        <div class="p-3 bg-rose-50 rounded-xl border border-rose-200 space-y-1.5">
+          <div class="flex items-center gap-2 font-bold text-rose-900">
+            <span class="w-5 h-5 rounded-full bg-rose-600 text-white flex items-center justify-center text-xs">1</span>
+            <span>จุดสแกนหลัก: QR Code ขนาดใหญ่ ล่างขวา (กรอบแดง)</span>
+          </div>
+          <p class="text-slate-700">ยิงจุดนี้จุดเดียว ระบบจะถอดรหัสอ่านข้อมูลอัตโนมัติครบถ้วน: <strong>Part No.</strong> (เช่น DHL6510L0F), <strong>Qty</strong> (เช่น 2 ชิ้น), <strong>Kanban</strong> (เช่น F539), Lot และวันที่รับเข้า</p>
+        </div>
+
+        <div class="p-3 bg-blue-50 rounded-xl border border-blue-200 space-y-1.5">
+          <div class="flex items-center gap-2 font-bold text-blue-900">
+            <span class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs">2</span>
+            <span>จุดสแกนสำรอง: Customer Part No / QR เล็ก (กรอบน้ำเงิน)</span>
+          </div>
+          <p class="text-slate-700">กรณี QR Code ใหญ่ชำรุด สามารถยิงบาร์โค้ดรหัสพาร์ทที่จุดนี้ แล้วระบุจำนวนชิ้นต่อกล่องในช่องกรอกข้อมูลเองได้</p>
+        </div>
+      </div>
+
+      <!-- Fast Scan & Link Later Workflow -->
+      <div class="bg-sky-50 p-4 rounded-xl border border-sky-200 space-y-2 text-xs sm:text-sm">
+        <h4 class="font-bold text-sky-950 flex items-center gap-1.5">
+          <i class="fa-solid fa-clock-rotate-left text-amber-600"></i>
+          <span>โหมด Wait PO และการสแกนรับเข้าไว้ก่อน (ผูก PO ภายหลัง):</span>
+        </h4>
+        <ol class="list-decimal list-inside space-y-1.5 text-slate-700">
+          <li><strong>โหมด Wait PO:</strong> หากสินค้ามาถึงก่อนที่ฝ่ายจัดซื้อจะออกเลข PO สามารถเลือก PO เป็น <span class="bg-amber-100 text-amber-800 px-1 rounded font-bold">Wait PO</span> เพื่อสแกนรับเข้าสต็อกและสแกนแพ็คได้ทันทีโดยไม่สะดุด</li>
+          <li><strong>การผูก PO ทีละรายการ / หลายรายการ:</strong> ดูที่ตาราง <em>Inbound Batches</em> ติ๊กเลือกกล่อง Part เดียวกัน แล้วกดปุ่ม <strong>"ผูก PO รายการที่เลือก (...)"</strong> เลือก PO และบันทึก ยอดจะวิ่งเข้าสต็อกของ PO นั้นทันที</li>
+          <li><strong>การจับคู่ PO อัตโนมัติ (FIFO):</strong> เมื่อฝ่ายจัดซื้อออกเลข PO เข้าระบบแล้ว สามารถกดปุ่ม <strong>"จับคู่ PO อัตโนมัติ (FIFO)"</strong> เพื่อให้ระบบจับคู่สินค้าที่รับเข้าไว้ก่อนเข้ากับ PO ที่ค้างส่งให้อัตโนมัติตามลำดับก่อน-หลัง</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Section 6: ตรวจสอบยอดและสรุปรายการ Rack -->
+    <div id="sec-tab3" class="page-break bg-white rounded-2xl border-2 border-emerald-300 p-5 sm:p-7 shadow-sm space-y-4">
+      <div class="flex items-center justify-between pb-2 border-b border-emerald-200">
+        <h2 class="text-lg font-bold text-emerald-950 flex items-center gap-2">
+          <span class="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-sm font-bold">6</span>
+          <span>การตรวจสอบยอด Balance และระบบจัดการ Rack (แท็บที่ 3: Recheck & Racks Breakdown)</span>
+        </h2>
+        <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">อัปเดตใหม่ Rev. 03</span>
+      </div>
+
+      <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs sm:text-sm space-y-2">
+        <h3 class="font-bold text-slate-800 flex items-center gap-1.5">
+          <i class="fa-solid fa-warehouse text-amber-600"></i>
+          <span>แผงสรุปรายการ Rack No. และ Part ต่างๆ ที่อยู่ใน Rack:</span>
+        </h3>
+        <p class="text-slate-600 leading-relaxed">
+          ใช้สำหรับหัวหน้างาน (Supervisor), QA และฝ่ายจัดส่ง เพื่อตรวจสอบว่าสินค้าในแต่ละ Rack ถูกจัดเรียงไว้ที่ไหน มี Part อะไรบ้าง จำนวนเท่าใด:
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+          <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+            <strong class="text-amber-800 block mb-1"><i class="fa-solid fa-table-cells-large mr-1"></i>มุมมองกล่อง Rack (Cards View):</strong>
+            <p class="text-slate-600 text-xs">แสดงเป็นการ์ดกล่องของแต่ละ Rack แสดงจำนวนชิ้น ยอดรวม สัดส่วน % พร้อมปุ่มพิมพ์ Tag และปุ่มจัดการ</p>
+          </div>
+          <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+            <strong class="text-blue-800 block mb-1"><i class="fa-solid fa-table-list mr-1"></i>มุมมองตารางละเอียด (Detailed Table):</strong>
+            <p class="text-slate-600 text-xs">แสดงเป็นตารางรวมทุก Rack เหมาะสำหรับการตรวจเช็คข้อมูลเชิงลึกและการตรวจสอบย้อนกลับ</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rack Management CRUD Guide -->
+      <h3 class="font-bold text-slate-900 text-xs sm:text-sm pt-1">ขั้นตอนการจัดการและแก้ไขข้อมูลใน Rack (CRUD Operations):</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5 text-xs">
+        <div class="p-3 bg-blue-50/80 rounded-xl border border-blue-200 space-y-1">
+          <strong class="text-blue-900 flex items-center gap-1"><i class="fa-solid fa-pen text-blue-600"></i> แก้ไข Part ใน Rack</strong>
+          <p class="text-slate-600">กดไอคอนดินสอที่แถว Part เพื่อปรับยอดจำนวนชิ้น หรือพิมพ์เปลี่ยนเลข Rack เพื่อย้าย Part นั้นไป Rack อื่นทันที</p>
+        </div>
+        <div class="p-3 bg-rose-50/80 rounded-xl border border-rose-200 space-y-1">
+          <strong class="text-rose-900 flex items-center gap-1"><i class="fa-solid fa-trash-can text-rose-600"></i> ลบ Part ออกจาก Rack</strong>
+          <p class="text-slate-600">กดไอคอนถังขยะที่แถว Part เพื่อลบรายการสแกนของ Part นั้นใน Rack ยอดจะถูกดึงกลับเข้าสู่ระบบ</p>
+        </div>
+        <div class="p-3 bg-amber-50/80 rounded-xl border border-amber-200 space-y-1">
+          <strong class="text-amber-900 flex items-center gap-1"><i class="fa-solid fa-arrow-right-arrow-left text-amber-600"></i> เปลี่ยนเลข / ย้าย Rack</strong>
+          <p class="text-slate-600">กดไอคอนดินสอข้างป้าย Rack พิมพ์เลข Rack ใหม่ (เช่น จาก 170 เป็น 171) ระบบจะย้ายพาร์ททั้งหมดใน Rack นั้นทันที</p>
+        </div>
+        <div class="p-3 bg-red-50/80 rounded-xl border border-red-200 space-y-1">
+          <strong class="text-red-900 flex items-center gap-1"><i class="fa-solid fa-dumpster text-red-600"></i> ลบข้อมูลทั้ง Rack</strong>
+          <p class="text-slate-600">กดไอคอนถังขยะสีแดงที่หัวกล่อง Rack เพื่อลบรายการสแกนทั้งหมดใน Rack นั้นเมื่อต้องการเคลียร์พื้นที่</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 7: สรุปการใช้กล่อง Carton -->
+    <div id="sec-tab4" class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-7 shadow-sm space-y-3">
+      <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2 pb-2 border-b border-slate-100">
+        <span class="w-7 h-7 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center text-sm font-bold">7</span>
+        <span>การตรวจสอบสรุปการใช้กล่อง Carton (แท็บที่ 4: BOM Carton)</span>
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-600">ใช้สำหรับตรวจสอบสต็อกกล่องกระดาษ และการเบิกกล่อง Carton มาใช้ในสายการผลิต:</p>
+      <ul class="list-disc list-inside space-y-1 text-xs sm:text-sm text-slate-700 pl-2">
+        <li><strong>ขนาดกล่อง (Box Code / Carton Type):</strong> ตรวจสอบรหัสกล่องตามฐานข้อมูล View BOM (เช่น C302515A07, C453029A14)</li>
+        <li><strong>พาร์ทที่บรรจุ (Part No. & Part Name):</strong> รายการชิ้นส่วนที่ต้องบรรจุลงในกล่องขนาดนั้น</li>
+        <li><strong>จำนวนชิ้นมาตรฐานต่อกล่อง (Standard Pack Qty):</strong> จำนวนชิ้นงานที่ต้องบรรจุใน 1 กล่อง</li>
+        <li><strong>จำนวนกล่องที่ใช้จริง (Total Boxes Used):</strong> จำนวนกล่อง Carton ที่ถูกแพ็คและจัดเรียงแล้ว</li>
+      </ul>
+    </div>
+
+    <!-- Section 8: การออกเอกสารส่งมอบและ Tag ติด Rack -->
+    <div id="sec-tab5" class="page-break bg-white rounded-2xl border-2 border-indigo-300 p-5 sm:p-7 shadow-sm space-y-4">
+      <div class="flex items-center justify-between pb-2 border-b border-indigo-200">
+        <h2 class="text-lg font-bold text-indigo-950 flex items-center gap-2">
+          <span class="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-sm font-bold">8</span>
+          <span>การออกเอกสารส่งมอบและ Tag ติด Rack (แท็บที่ 5: เอกสารมาตรฐาน KOCH)</span>
+        </h2>
+        <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-800 border border-indigo-300">อัปเดตใหม่ Rev. 03</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs sm:text-sm">
+        <!-- Document 1: Package Label -->
+        <div class="p-4 bg-amber-50/70 rounded-xl border-2 border-amber-300 space-y-2 flex flex-col justify-between">
+          <div class="space-y-1.5">
+            <div class="flex items-center gap-2 font-bold text-amber-950 text-sm">
+              <i class="fa-solid fa-tag text-amber-600"></i>
+              <span>Package Label (Tag ติด Rack)</span>
+            </div>
+            <p class="text-slate-600 text-xs">
+              พิมพ์ Tag แปะติด Rack แนวนอน A4 ตามมาตรฐาน KOCH พร้อม Barcode, PO, Line, Part No, Supplier Code (KT076), Qty และช่องลายเซ็น
+            </p>
+          </div>
+          <div class="space-y-1 pt-2 border-t border-amber-200 text-xs">
+            <p>• <strong>พิมพ์ราย Rack:</strong> กดปุ่มพิมพ์ Tag ที่กล่อง Rack ในแท็บ 3</p>
+            <p>• <strong>พิมพ์ทุก Rack:</strong> กดปุ่ม <em>"พิมพ์ Tag ทุก Rack"</em></p>
+            <p>• <strong>Excel:</strong> ดาวน์โหลดไฟล์ Excel พร้อมเปิดแก้ไขได้</p>
+          </div>
+        </div>
+
+        <!-- Document 2: DeliveryTripSheet Lamp -->
+        <div class="p-4 bg-emerald-50/70 rounded-xl border-2 border-emerald-300 space-y-2 flex flex-col justify-between">
+          <div class="space-y-1.5">
+            <div class="flex items-center gap-2 font-bold text-emerald-950 text-sm">
+              <i class="fa-solid fa-truck text-emerald-600"></i>
+              <span>DeliveryTripSheet (ชุด 2 ฉบับ)</span>
+            </div>
+            <p class="text-slate-600 text-xs">
+              Trip Sheet สำหรับทีมขนส่ง (Transport) และทีมรับสินค้า (MLYA) ระบุทะเบียนรถ เวลาส่งมอบ และ Rack No จัดพิมพ์ชุด 2 ฉบับ
+            </p>
+          </div>
+          <div class="space-y-1 pt-2 border-t border-emerald-200 text-xs">
+            <p>• <strong>พิมพ์ 2 ฉบับ:</strong> หน้า 1 เป็น Copy 1 (ต้นฉบับ สีแดง) และหน้า 2 เป็น Copy 2 (สำเนา สีน้ำเงิน)</p>
+            <p>• <strong>Excel 2 Sheet:</strong> มีชีต Copy 1 และ Copy 2 แยกกันสมบูรณ์</p>
+          </div>
+        </div>
+
+        <!-- Document 3: Sheet DN -->
+        <div class="p-4 bg-indigo-50/70 rounded-xl border-2 border-indigo-300 space-y-2 flex flex-col justify-between">
+          <div class="space-y-1.5">
+            <div class="flex items-center gap-2 font-bold text-indigo-950 text-sm">
+              <i class="fa-solid fa-file-invoice text-indigo-600"></i>
+              <span>Sheet: DN (Delivery Note)</span>
+            </div>
+            <p class="text-slate-600 text-xs">
+              สรุปจำนวนส่งมอบตาม PO Line สำหรับเย็บติดบิลซัพพลายเออร์ พร้อมช่องลงชื่อผู้ออกเอกสาร (KOCH) และผู้รับสินค้า (MLYA)
+            </p>
+          </div>
+          <div class="space-y-1 pt-2 border-t border-indigo-200 text-xs">
+            <p>• <strong>พิมพ์ DN:</strong> เปิดหน้าพิมพ์ A4 แนวนอนตามแบบฟอร์มโรงงาน</p>
+            <p>• <strong>Excel DN:</strong> ดาวน์โหลดไฟล์ Excel พร้อมใช้งานทันที</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 9: การเชื่อมโยงภายนอก (WMS & Plan Production) -->
+    <div id="sec-sync" class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-7 shadow-sm space-y-4">
+      <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2 pb-2 border-b border-slate-100">
+        <span class="w-7 h-7 rounded-lg bg-teal-100 text-teal-800 flex items-center justify-center text-sm font-bold">9</span>
+        <span>การซิงค์ข้อมูลกับระบบภายนอก (WMS & Plan Production Integration)</span>
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
+        <div class="p-3.5 bg-blue-50/70 rounded-xl border border-blue-200 space-y-2">
+          <h4 class="font-bold text-blue-950 flex items-center gap-1.5">
+            <i class="fa-solid fa-arrows-rotate text-blue-600"></i>
+            <span>ระบบซิงค์ข้อมูลจาก WMS อัตโนมัติ (WMS Sync)</span>
+          </h4>
+          <p class="text-slate-700 leading-relaxed">
+            ระบบมี Background Worker ตรวจสอบและดึงข้อมูลรับเข้าล่าสุดจากระบบ WMS อัตโนมัติทุกๆ 10 นาที หรือสามารถกดปุ่ม <strong>"ซิงค์ WMS"</strong> บนแถบเมนูเพื่อดึงข้อมูลรับเข้าล่าสุดได้ทันที
+          </p>
+        </div>
+
+        <div class="p-3.5 bg-emerald-50/70 rounded-xl border border-emerald-200 space-y-2">
+          <h4 class="font-bold text-emerald-950 flex items-center gap-1.5">
+            <i class="fa-solid fa-paper-plane text-emerald-600"></i>
+            <span>การส่งยอดแพ็คเข้า Plan Production (Port 5000)</span>
+          </h4>
+          <p class="text-slate-700 leading-relaxed">
+            ทุกการสแกนแพ็คจะถูกส่งเข้าไปบันทึกในตาราง Record Production ของกระบวนการ <strong>Packing Machine 1</strong> แบบเรียลไทม์ และสามารถกดปุ่ม <strong>"ส่งยอด Packing"</strong> เพื่อตรวจสอบและยืนยันส่งยอดย้อนหลังได้
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 10: การแก้ไขปัญหาเบื้องต้น -->
+    <div id="sec-trouble" class="bg-white rounded-2xl border-2 border-rose-200 p-5 sm:p-7 shadow-sm space-y-4">
+      <h2 class="text-lg font-bold text-rose-950 flex items-center gap-2 pb-2 border-b border-rose-200">
+        <span class="w-7 h-7 rounded-lg bg-rose-600 text-white flex items-center justify-center text-sm font-bold">10</span>
+        <span>คู่มือการแก้ไขปัญหาเบื้องต้น (Troubleshooting Guide)</span>
+      </h2>
+
+      <div class="space-y-3 text-xs sm:text-sm">
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+          <h4 class="font-bold text-slate-900">1. หา PO ไม่เจอใน Dropdown:</h4>
+          <p class="text-slate-600">• ตรวจสอบปุ่มตัวกรองข้าง Dropdown หากขึ้นว่า <em>"ค้างแพ็ค (ซ่อน Complete)"</em> ให้กดสลับเป็น <strong>"ทุก PO"</strong></p>
+          <p class="text-slate-600">• หรือคลิกปุ่ม <strong>[🔍 ค้นหา]</strong> สีเหลือง แล้วพิมพ์เลข PO ที่ต้องการ</p>
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+          <h4 class="font-bold text-slate-900">2. เปิดกล้องบนมือถือแล้วจอดำ หรือแจ้งเตือนไม่มีสิทธิ์:</h4>
+          <p class="text-slate-600">• แตะที่ไอคอนแม่กุญแจหน้า URL ในเบราว์เซอร์มือถือ แล้วกด <strong>"อนุญาตให้ใช้กล้อง (Allow Camera)"</strong></p>
+          <p class="text-slate-600">• หรือสแกนเปิดผ่านลิงก์ <strong>HTTPS (Cloudflare)</strong> จากหน้าต่าง "เปิดในมือถือ"</p>
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+          <h4 class="font-bold text-slate-900">3. ยิงบาร์โค้ดแล้วตัวเลขไม่ขึ้นในช่อง:</h4>
+          <p class="text-slate-600">• แตะหรือคลิกที่ช่องกรอกบาร์โค้ดให้มีกรอบสีฟ้าเรืองแสง (Focus) ก่อนยิงสแกน</p>
+          <p class="text-slate-600">• ตรวจสอบแบตเตอรี่และสายเชื่อมต่อของปืนสแกนบาร์โค้ด</p>
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+          <h4 class="font-bold text-slate-900">4. เผลอสแกนชิ้นงานซ้ำเกินยอดจริง:</h4>
+          <p class="text-slate-600">• กดปุ่มสีเหลือง <strong>"ยกเลิกรายการล่าสุด (Undo Scan)"</strong> หรือคลิกไอคอนถังขยะสีแดงในตาราง Recent Scans</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 11: การควบคุมระบบ 24 ชม. -->
+    <div id="sec-control24" class="bg-slate-900 text-white rounded-2xl p-5 sm:p-7 shadow-sm space-y-3">
+      <h3 class="font-bold text-base flex items-center gap-2 text-yellow-400">
+        <i class="fa-solid fa-server"></i>
+        <span>การควบคุมระบบรันตลอด 24 ชั่วโมง (24H System Control Files)</span>
+      </h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+        <div class="bg-slate-800 p-2.5 rounded-lg border border-slate-700">
+          <strong class="text-emerald-400 font-mono">SETUP_AUTOSTART_24H.bat</strong>
+          <p class="text-slate-300 mt-1">ติดตั้งระบบให้ออนไลน์อัตโนมัติตอนเปิดเครื่องคอมพิวเตอร์ (Auto-boot)</p>
+        </div>
+        <div class="bg-slate-800 p-2.5 rounded-lg border border-slate-700">
+          <strong class="text-blue-400 font-mono">STATUS_24H_SYSTEM.bat</strong>
+          <p class="text-slate-300 mt-1">ตรวจสอบสถานะการทำงาน IP Address และลิงก์เชื่อมต่อมือถือ</p>
+        </div>
+        <div class="bg-slate-800 p-2.5 rounded-lg border border-slate-700">
+          <strong class="text-yellow-400 font-mono">START_24H_BACKGROUND.vbs</strong>
+          <p class="text-slate-300 mt-1">สั่งเปิดระบบทำงานเงียบๆ ในพื้นหลังทันทีโดยไม่มีหน้าต่างสีดำ</p>
+        </div>
+        <div class="bg-slate-800 p-2.5 rounded-lg border border-slate-700">
+          <strong class="text-rose-400 font-mono">STOP_24H_SYSTEM.bat</strong>
+          <p class="text-slate-300 mt-1">สั่งปิดเซิร์ฟเวอร์และหยุดการทำงานของระบบทั้งหมด</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Document Footer -->
+    <div class="text-center text-xs text-slate-400 pt-4 pb-12 border-t border-slate-200">
+      <p>เอกสารคู่มือมาตรฐานการปฏิบัติงาน (Work Instruction) - ระบบ LAMP Packing & Delivery Verification System</p>
+      <p>ฉบับปรับปรุง: Rev. 03 (09 ตุลาคม 2026) | สงวนลิขสิทธิ์สำหรับใช้งานภายในสถานประกอบการ</p>
+    </div>
+
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeliveryTripSheet Lamp - KOCH PACKAGING</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f1f5f9;
+      font-family: Calibri, "Segoe UI", Roboto, Arial, sans-serif;
+      color: #000;
+    }
+
+    /* Print toolbar at top */
+    .print-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      background: #1e293b;
+      color: #fff;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .print-toolbar .title-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .print-toolbar .btn-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .toolbar-btn {
+      background: #3b82f6;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s ease;
+      text-decoration: none;
+    }
+    .toolbar-btn:hover {
+      background: #2563eb;
+    }
+    .toolbar-btn.btn-excel {
+      background: #10b981;
+    }
+    .toolbar-btn.btn-excel:hover {
+      background: #059669;
+    }
+    .toolbar-btn.btn-secondary {
+      background: #475569;
+    }
+    .toolbar-btn.btn-secondary:hover {
+      background: #334155;
+    }
+    .data-select {
+      background: #0f172a;
+      color: #fff;
+      border: 1px solid #475569;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    /* Outer wrapper containing the page */
+    .print-canvas {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .page-divider {
+      width: 820px;
+      text-align: center;
+      margin: 18px 0;
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* Individual DeliveryTripSheet Sheet */
+    .trip-sheet-card {
+      width: 820px;
+      background: #fff;
+      border: 2px solid #000;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      padding: 0;
+      position: relative;
+      margin-bottom: 24px;
+    }
+    .trip-sheet-card:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Top Logo & Company Header */
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #000;
+      padding: 6px 16px;
+      min-height: 56px;
+      position: relative;
+    }
+    .header-logo {
+      height: 44px;
+      width: auto;
+      object-fit: contain;
+    }
+    .header-company-title {
+      position: absolute;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 14.5px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    /* Metadata Area */
+    .meta-container {
+      padding: 10px 20px 8px 20px;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    .meta-row {
+      display: flex;
+      align-items: baseline;
+      margin-bottom: 3px;
+    }
+    .meta-col {
+      display: flex;
+      align-items: baseline;
+    }
+    .meta-label {
+      font-weight: bold;
+      white-space: nowrap;
+      margin-right: 6px;
+    }
+    .meta-value {
+      font-weight: bold;
+    }
+
+    /* Items Table */
+    .items-table-container {
+      width: 100%;
+      border-top: 1px solid #000;
+      border-bottom: 1px solid #000;
+    }
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10.5px;
+    }
+    .items-table th {
+      border: 1px solid #000;
+      padding: 4px 3px;
+      font-weight: bold;
+      text-align: center;
+      background: #fff;
+      white-space: nowrap;
+      font-size: 11px;
+    }
+    .items-table td {
+      border: 1px solid #000;
+      padding: 2.5px 5px;
+      height: 20px;
+      vertical-align: middle;
+      font-size: 10.5px;
+    }
+
+    .col-no { width: 34px; text-align: center; }
+    .col-inv { width: 92px; text-align: center; font-family: monospace; }
+    .col-po { width: 56px; text-align: center; font-family: monospace; }
+    .col-line { width: 36px; text-align: center; }
+    .col-partno { width: 110px; text-align: left; padding-left: 6px !important; font-family: monospace; font-weight: bold; }
+    .col-partname { width: 185px; text-align: left; padding-left: 6px !important; }
+    .col-qty { width: 50px; text-align: right; padding-right: 6px !important; font-family: monospace; font-weight: bold; }
+    .col-dn { width: 95px; text-align: center; font-family: monospace; }
+    .col-rack { width: 55px; text-align: center; }
+    .col-remark { width: 80px; text-align: center; }
+
+    /* Total Row */
+    .row-total td {
+      border: 1px solid #000;
+      font-weight: bold;
+      height: 24px;
+    }
+    .total-title-cell {
+      text-align: right;
+      padding-right: 12px !important;
+      font-weight: bold;
+      font-size: 11px;
+    }
+    .total-qty-cell {
+      text-align: right;
+      padding-right: 6px !important;
+      font-weight: bold;
+      font-size: 11.5px;
+      font-family: monospace;
+    }
+
+    /* Handover Team Section */
+    .teams-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      font-size: 11px;
+    }
+    .teams-table th {
+      border: 1px solid #000;
+      padding: 4px;
+      text-align: center;
+      font-weight: bold;
+      background: #fff;
+      font-size: 11.5px;
+    }
+    .teams-table td {
+      border: 1px solid #000;
+      padding: 3px 6px;
+      height: 22px;
+      vertical-align: middle;
+      font-size: 10.5px;
+    }
+    .team-label-col {
+      font-weight: bold;
+      width: 95px;
+      white-space: nowrap;
+    }
+    .team-val-col {
+      width: 175px;
+    }
+
+    /* Remark Box */
+    .remark-box-container {
+      margin: 12px 0 16px 0;
+      padding: 0 16px;
+    }
+    .remark-box {
+      border: 1px solid #000;
+      min-height: 55px;
+      padding: 6px 10px;
+      font-size: 11px;
+    }
+    .remark-title {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    /* Print Setup */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 6mm 4mm;
+      }
+      html, body {
+        background: #fff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-canvas {
+        padding: 0 !important;
+        display: block !important;
+      }
+      .trip-sheet-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-shadow: none !important;
+        border: 2px solid #000 !important;
+        margin: 0 0 0 0 !important;
+        page-break-after: always !important;
+        break-after: page !important;
+      }
+      .trip-sheet-card:last-child {
+        page-break-after: auto !important;
+        break-after: auto !important;
+      }
+      .copy-badge {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Action Toolbar -->
+  <div class="print-toolbar no-print">
+    <div class="title-area">
+      <i class="fa-solid fa-truck text-emerald-400"></i>
+      <span>DeliveryTripSheet Lamp (MST)</span>
+      <span style="background: #334155; padding: 2px 8px; border-radius: 4px; font-size: 12px;">
+        {{ items|length }} รายการ | {{ total_qty }} ชิ้น
+      </span>
+      <span style="background: #059669; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">
+        ปริ้น {{ copies }} ฉบับ (ต้นฉบับ + สำเนา)
+      </span>
+    </div>
+
+    <div class="btn-group">
+      <!-- Data source switcher -->
+      <select id="dataModeSelect" class="data-select" onchange="onDataModeChange(this.value)" title="เลือกหมายเลขบิล / ข้อมูล">
+        <option value="11726091882" {% if invoice_no == '11726091882' %}selected{% endif %}>
+          📋 บิล 11726091882 (ตัวอย่าง 63 รายการ | 1,502 ชิ้น)
+        </option>
+        {% for inv in available_invoices %}
+          {% if inv.invoice_no != '11726091882' and inv.invoice_no != 'WAIT_PO' and inv.invoice_no != '-' %}
+          <option value="{{ inv.invoice_no }}" {% if invoice_no == inv.invoice_no %}selected{% endif %}>
+            🏷️ บิล {{ inv.invoice_no }} ({{ inv.total_qty }} ชิ้น)
+          </option>
+          {% endif %}
+        {% endfor %}
+      </select>
+
+      <!-- Copies Selector -->
+      <select id="copySelect" class="data-select" onchange="onCopiesChange(this.value)" title="เลือกจำนวนฉบับที่ต้องการพิมพ์">
+        <option value="2" {% if copies == 2 %}selected{% endif %}>📄 2 ฉบับ (ต้นฉบับ + สำเนา) [มาตรฐาน]</option>
+        <option value="1" {% if copies == 1 %}selected{% endif %}>📄 1 ฉบับ</option>
+        <option value="3" {% if copies == 3 %}selected{% endif %}>📄 3 ฉบับ</option>
+        <option value="4" {% if copies == 4 %}selected{% endif %}>📄 4 ฉบับ</option>
+      </select>
+
+      <!-- Print Button -->
+      <button class="toolbar-btn" onclick="window.print()">
+        <i class="fa-solid fa-print"></i> สั่งพิมพ์ ({{ copies }} ฉบับ)
+      </button>
+
+      <!-- Excel Export -->
+      <a class="toolbar-btn btn-excel" href="/export_delivery_trip_sheet_excel?po_no={{ target_po or 'ALL' }}&invoice_no={{ invoice_no }}">
+        <i class="fa-solid fa-file-excel"></i> ดาวน์โหลด Excel (2 ฉบับ)
+      </a>
+
+      <!-- Close Button -->
+      <button class="toolbar-btn btn-secondary" onclick="window.close()">
+        <i class="fa-solid fa-xmark"></i> ปิด
+      </button>
+    </div>
+  </div>
+
+  <!-- Print Canvas: Container of the Document Sheets -->
+  <div class="print-canvas">
+    {% for copy_idx in range(1, copies + 1) %}
+      {% if not loop.first %}
+      <div class="page-divider no-print">
+        <span>────── แผ่นที่ {{ loop.index }} ──────</span>
+      </div>
+      {% endif %}
+
+      <div class="trip-sheet-card">
+        <!-- Header: Logo & Company -->
+        <div class="header-row">
+          <img src="/static/koch_logo.png" alt="KOCH" class="header-logo" onerror="this.src='/static/koch_logo.jpeg'">
+          <div class="header-company-title">KOCH PACKAGING AND PACKING SERVICES</div>
+          <div style="width: 44px;"></div>
+        </div>
+
+        <!-- Metadata Section -->
+        <div class="meta-container">
+          <!-- Row 1 -->
+          <div class="meta-row">
+            <div class="meta-col" style="width: 170px;">
+              <span class="meta-label">Shipper :</span>
+              <span class="meta-value">{{ shipper }}</span>
+            </div>
+            <div class="meta-col" style="width: 250px;">
+              <span class="meta-label">Ship Date :</span>
+              <span class="meta-value">{{ ship_date }}</span>
+            </div>
+            <div class="meta-col" style="flex: 1;">
+              <span class="meta-label">Invoice No. :</span>
+              <span class="meta-value">{{ invoice_no }}</span>
+            </div>
+          </div>
+
+          <!-- Row 2 -->
+          <div class="meta-row">
+            <div class="meta-col" style="width: 170px;">
+              <span class="meta-label">Ship To :</span>
+              <span class="meta-value">{{ ship_to }}</span>
+            </div>
+            <div class="meta-col" style="width: 250px;">
+              <span class="meta-label">Trip Number :</span>
+              <span class="meta-value">{{ trip_number }}</span>
+            </div>
+            <div class="meta-col" style="flex: 1;">
+              <span class="meta-label">Supplier Name:</span>
+              <span class="meta-value">{{ supplier_name }}</span>
+            </div>
+          </div>
+
+          <!-- Row 3 -->
+          <div class="meta-row">
+            <div class="meta-col">
+              <span class="meta-label">Trip Sheet Number :</span>
+              <span class="meta-value">{{ trip_sheet_number }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Items Table -->
+        <div class="items-table-container">
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th class="col-no">No.</th>
+                <th class="col-inv">Invoice No.</th>
+                <th class="col-po">Po No.</th>
+                <th class="col-line">Line</th>
+                <th class="col-partno">Part No.</th>
+                <th class="col-partname">Part Name</th>
+                <th class="col-qty">QTY</th>
+                <th class="col-dn">Delivery Note</th>
+                <th class="col-rack">Rack No.</th>
+                <th class="col-remark">Remark</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for itm in items %}
+              <tr>
+                <td class="col-no">{{ itm.no }}</td>
+                <td class="col-inv">{{ itm.invoice_no }}</td>
+                <td class="col-po">{{ itm.po_no }}</td>
+                <td class="col-line">{{ itm.line }}</td>
+                <td class="col-partno">{{ itm.part_no }}</td>
+                <td class="col-partname">{{ itm.part_name }}</td>
+                <td class="col-qty">{{ itm.qty }}</td>
+                <td class="col-dn">{{ itm.delivery_note }}</td>
+                <td class="col-rack">{{ itm.rack_no }}</td>
+                <td class="col-remark">{{ itm.remark }}</td>
+              </tr>
+              {% endfor %}
+
+              <!-- Total Row -->
+              <tr class="row-total">
+                <td colspan="6" class="total-title-cell">Total :</td>
+                <td class="total-qty-cell">{{ total_qty }}</td>
+                <td class="col-dn"></td>
+                <td class="col-rack"></td>
+                <td class="col-remark"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Handover Teams Table -->
+        <div style="padding: 0 16px;">
+          <table class="teams-table">
+            <thead>
+              <tr>
+                <th colspan="2">KOCH Team</th>
+                <th colspan="2">Transport Team</th>
+                <th colspan="2">MLYA Team</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="team-label-col">Shipper Name :</td>
+                <td class="team-val-col"></td>
+                <td class="team-label-col">Driver Name :</td>
+                <td class="team-val-col"></td>
+                <td class="team-label-col">Recipient Name :</td>
+                <td class="team-val-col"></td>
+              </tr>
+              <tr>
+                <td class="team-label-col">Time :</td>
+                <td class="team-val-col"></td>
+                <td class="team-label-col">Truck No :</td>
+                <td class="team-val-col"></td>
+                <td class="team-label-col">Time :</td>
+                <td class="team-val-col"></td>
+              </tr>
+              <tr>
+                <td class="team-label-col">Delivery Date :</td>
+                <td class="team-val-col"></td>
+                <td class="team-label-col">Receive Date :</td>
+                <td class="team-val-col"></td>
+                <td class="team-label-col">Receive Date :</td>
+                <td class="team-val-col"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Remark Box -->
+        <div class="remark-box-container">
+          <div class="remark-box">
+            <div class="remark-title">Remark :</div>
+          </div>
+        </div>
+
+      </div>
+    {% endfor %}
+  </div>
+
+  <script>
+    function onDataModeChange(val) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('invoice_no', val);
+      window.location.href = url.toString();
+    }
+
+    function onCopiesChange(val) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('copies', val);
+      window.location.href = url.toString();
+    }
+  </script>
+</body>
+</html>

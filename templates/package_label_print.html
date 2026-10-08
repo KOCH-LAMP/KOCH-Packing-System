@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Package Label (Tag ติด Rack) - KOCH</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f1f5f9;
+      font-family: Calibri, "Segoe UI", Roboto, Arial, sans-serif;
+      color: #000;
+    }
+
+    /* Print toolbar at top */
+    .print-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      background: #1e293b;
+      color: #fff;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .print-toolbar .title-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .print-toolbar .btn-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .toolbar-btn {
+      background: #3b82f6;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s ease;
+      text-decoration: none;
+    }
+    .toolbar-btn:hover {
+      background: #2563eb;
+    }
+    .toolbar-btn.btn-excel {
+      background: #10b981;
+    }
+    .toolbar-btn.btn-excel:hover {
+      background: #059669;
+    }
+    .toolbar-btn.btn-secondary {
+      background: #475569;
+    }
+    .toolbar-btn.btn-secondary:hover {
+      background: #334155;
+    }
+    .rack-select {
+      background: #0f172a;
+      color: #fff;
+      border: 1px solid #475569;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    /* Outer wrapper containing the pages */
+    .print-canvas {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+    }
+
+    /* Individual Package Label Sheet */
+    .package-label-card {
+      width: 1050px;
+      background: #fff;
+      border: 2px solid #000;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      padding: 0;
+      position: relative;
+      page-break-after: always;
+      page-break-inside: avoid;
+    }
+    .package-label-card:last-child {
+      page-break-after: auto;
+    }
+
+    /* Top Logo & Company Header */
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #000;
+      padding: 8px 16px;
+      min-height: 64px;
+      position: relative;
+    }
+    .header-logo {
+      height: 48px;
+      width: auto;
+      object-fit: contain;
+    }
+    .header-company-title {
+      position: absolute;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 15px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    /* Banner: Package Label */
+    .banner-title-box {
+      border-bottom: 2px solid #000;
+      text-align: center;
+      padding: 7px 0;
+      font-size: 20px;
+      font-weight: bold;
+      font-family: 'Abadi', Calibri, Arial, sans-serif;
+      background-color: #fff;
+    }
+
+    /* Metadata Key-Value Area */
+    .meta-container {
+      padding: 12px 24px 10px 24px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .meta-row {
+      display: flex;
+      align-items: baseline;
+      margin-bottom: 4px;
+    }
+    .meta-col {
+      display: flex;
+      align-items: baseline;
+    }
+    .meta-label {
+      font-weight: bold;
+      white-space: nowrap;
+      margin-right: 6px;
+    }
+    .meta-value {
+      font-weight: bold;
+    }
+
+    /* Table of Parts */
+    .items-table-container {
+      width: 100%;
+      border-top: 1px solid #000;
+      border-bottom: 1px solid #000;
+    }
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11.5px;
+    }
+    .items-table th {
+      border: 1px solid #000;
+      padding: 5px 4px;
+      font-weight: bold;
+      text-align: center;
+      background: #fff;
+      white-space: nowrap;
+    }
+    .items-table th .filter-arrow {
+      font-size: 9px;
+      margin-left: 2px;
+      color: #333;
+    }
+    .items-table td {
+      border: 1px solid #000;
+      padding: 4px 6px;
+      height: 25px;
+      vertical-align: middle;
+      font-size: 11.5px;
+    }
+
+    .col-no { width: 45px; text-align: center; }
+    .col-rack { width: 75px; text-align: center; }
+    .col-po { width: 85px; text-align: center; }
+    .col-line { width: 50px; text-align: center; }
+    .col-partno { width: 140px; text-align: left; padding-left: 8px !important; }
+    .col-partname { width: 220px; text-align: left; padding-left: 8px !important; }
+    .col-invqty { width: 85px; text-align: right; padding-right: 8px !important; }
+    .col-domqty { width: 75px; text-align: right; padding-right: 8px !important; }
+    .col-expqty { width: 70px; text-align: center; }
+    .col-delqty { width: 95px; text-align: right; padding-right: 8px !important; }
+    .col-remark { width: 95px; text-align: center; }
+
+    /* Total Row */
+    .row-total td {
+      border: 1px solid #000;
+      font-weight: bold;
+      height: 26px;
+    }
+    .total-title-cell {
+      text-align: right;
+      padding-right: 12px !important;
+      font-weight: bold;
+    }
+    .total-qty-cell {
+      text-align: right;
+      padding-right: 8px !important;
+      font-weight: bold;
+    }
+
+    /* Signature Section */
+    .signature-container {
+      padding: 16px 45px 24px 45px;
+      font-size: 12px;
+    }
+    .signature-title {
+      font-weight: bold;
+      margin-bottom: 22px;
+    }
+    .signature-line {
+      font-weight: bold;
+      margin-bottom: 4px;
+      letter-spacing: 1px;
+    }
+    .signature-company {
+      font-weight: bold;
+      margin-top: 4px;
+      font-size: 11px;
+    }
+
+    /* Empty table rows */
+    .empty-row td {
+      height: 25px;
+      border: 1px solid #000;
+    }
+
+    /* Print Setup */
+    @media print {
+      @page {
+        size: A4 landscape;
+        margin: 8mm 6mm;
+      }
+      html, body {
+        background: #fff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-canvas {
+        padding: 0 !important;
+        gap: 0 !important;
+        display: block !important;
+      }
+      .package-label-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-shadow: none !important;
+        border: 2px solid #000 !important;
+        margin-bottom: 0 !important;
+        page-break-after: always !important;
+        page-break-inside: avoid !important;
+      }
+      .package-label-card:last-child {
+        page-break-after: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Action Toolbar -->
+  <div class="print-toolbar no-print">
+    <div class="title-area">
+      <i class="fa-solid fa-tag" style="color: #60a5fa;"></i>
+      <span>พิมพ์ Package Label (Tag ติด Rack)</span>
+      <span style="background: #334155; padding: 2px 8px; border-radius: 4px; font-size: 12px;">
+        {{ labels|length }} แผ่น
+      </span>
+    </div>
+
+    <div class="btn-group">
+      <!-- Rack selector -->
+      <select id="rackFilterSelect" class="rack-select" onchange="onRackFilterChange(this.value)">
+        <option value="ALL" {% if not selected_rack or selected_rack == 'ALL' %}selected{% endif %}>
+          📋 แสดงทุก Rack ({{ labels|length }} แผ่น)
+        </option>
+        {% for lb in all_racks_list %}
+        <option value="{{ lb }}" {% if selected_rack == lb %}selected{% endif %}>
+          🏷️ Rack {{ lb }}
+        </option>
+        {% endfor %}
+      </select>
+
+      <!-- Print Button -->
+      <button class="toolbar-btn" onclick="window.print()">
+        <i class="fa-solid fa-print"></i> สั่งพิมพ์ (Print)
+      </button>
+
+      <!-- Excel Export -->
+      <a class="toolbar-btn btn-excel" href="/export_rack_label_excel?rack_no={{ selected_rack or 'ALL' }}&po_no={{ target_po or 'ALL' }}&invoice_no={{ target_inv or 'ALL' }}">
+        <i class="fa-solid fa-file-excel"></i> ดาวน์โหลด Excel
+      </a>
+
+      <!-- Close Button -->
+      <button class="toolbar-btn btn-secondary" onclick="window.close()">
+        <i class="fa-solid fa-xmark"></i> ปิด
+      </button>
+    </div>
+  </div>
+
+  <!-- Print Canvas: Container of all Label Cards -->
+  <div class="print-canvas">
+    {% if not labels %}
+      <div style="background: #fff; padding: 40px; border-radius: 8px; text-align: center; border: 1px solid #cbd5e1; max-width: 500px; margin-top: 50px;">
+        <i class="fa-solid fa-circle-exclamation" style="font-size: 36px; color: #f59e0b; margin-bottom: 12px;"></i>
+        <h3 style="margin: 0 0 8px 0;">ไม่พบข้อมูลการสแกนใน Rack ที่ระบุ</h3>
+        <p style="color: #64748b; font-size: 14px; margin-bottom: 16px;">
+          กรุณาเลือก Rack อื่น หรือสแกนชิ้นงานเข้าระบบก่อนพิมพ์
+        </p>
+        <button class="toolbar-btn" onclick="onRackFilterChange('ALL')">ดูทุก Rack</button>
+      </div>
+    {% endif %}
+
+    {% for label in labels %}
+      <div class="package-label-card" id="card-rack-{{ label.rack_no }}">
+        <!-- Header: Logo & Company -->
+        <div class="header-row">
+          <img src="/static/koch_logo.png" alt="KOCH" class="header-logo" onerror="this.src='/static/koch_logo.jpeg'">
+          <div class="header-company-title">KOCH PACKAGING AND PACKING SERVICES</div>
+          <div style="width: 48px;"></div> <!-- balance spacer -->
+        </div>
+
+        <!-- Title Banner -->
+        <div class="banner-title-box">
+          Package Label
+        </div>
+
+        <!-- Metadata Section -->
+        <div class="meta-container">
+          <!-- Row 1: Shipper, Ship To, Package No. -->
+          <div class="meta-row">
+            <div class="meta-col" style="width: 250px;">
+              <span class="meta-label">Shipper :</span>
+              <span class="meta-value">{{ shipper }}</span>
+            </div>
+            <div class="meta-col" style="width: 320px;">
+              <span class="meta-label">Ship To :</span>
+              <span class="meta-value">{{ ship_to }}</span>
+            </div>
+            <div class="meta-col" style="flex: 1;">
+              <span class="meta-label">Package No. :</span>
+              <span class="meta-value">{{ label.package_no }}</span>
+            </div>
+          </div>
+
+          <!-- Row 2: Supplier Code, Invoice No. -->
+          <div class="meta-row">
+            <div class="meta-col" style="width: 250px;">
+              <span class="meta-label">Supplier Code :</span>
+              <span class="meta-value">{{ supplier_code }}</span>
+            </div>
+            <div class="meta-col" style="flex: 1;">
+              <span class="meta-label">Invoice No. :</span>
+              <span class="meta-value">{{ label.invoice_no }}</span>
+            </div>
+          </div>
+
+          <!-- Row 3: Supplier Name -->
+          <div class="meta-row">
+            <div class="meta-col">
+              <span class="meta-label">Supplier Name:</span>
+              <span class="meta-value">{{ supplier_name }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Items Table -->
+        <div class="items-table-container">
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th class="col-no">No.<span class="filter-arrow">▾</span></th>
+                <th class="col-rack">Rack No<span class="filter-arrow">▾</span></th>
+                <th class="col-po">PO. No.<span class="filter-arrow">▾</span></th>
+                <th class="col-line">Line<span class="filter-arrow">▾</span></th>
+                <th class="col-partno">Part No.<span class="filter-arrow">▾</span></th>
+                <th class="col-partname">Part Name<span class="filter-arrow">▾</span></th>
+                <th class="col-invqty">Invoice Q'ty<span class="filter-arrow">▾</span></th>
+                <th class="col-domqty">Dom Q'ty<span class="filter-arrow">▾</span></th>
+                <th class="col-expqty">Exp Q'ty<span class="filter-arrow">▾</span></th>
+                <th class="col-delqty">Delivery QTY<span class="filter-arrow">▾</span></th>
+                <th class="col-remark">Remark<span class="filter-arrow">▾</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for itm in label['items'] %}
+              <tr>
+                <td class="col-no">{{ itm.no }}</td>
+                <td class="col-rack">{{ itm.rack_no }}</td>
+                <td class="col-po">{{ itm.po_no }}</td>
+                <td class="col-line">{{ itm.line }}</td>
+                <td class="col-partno">{{ itm.part_no }}</td>
+                <td class="col-partname">{{ itm.part_name }}</td>
+                <td class="col-invqty">{{ itm.invoice_qty }}</td>
+                <td class="col-domqty">{{ itm.dom_qty }}</td>
+                <td class="col-expqty">{{ itm.exp_qty }}</td>
+                <td class="col-delqty">{{ itm.delivery_qty }}</td>
+                <td class="col-remark">{{ itm.remark }}</td>
+              </tr>
+              {% endfor %}
+
+              <!-- Empty padding rows to maintain visual geometry (minimum 4-5 total rows) -->
+              {% set empty_rows_count = 4 - label['items']|length %}
+              {% if empty_rows_count < 2 %}
+                {% set empty_rows_count = 2 %}
+              {% endif %}
+              {% for _ in range(empty_rows_count) %}
+              <tr class="empty-row">
+                <td class="col-no"></td>
+                <td class="col-rack"></td>
+                <td class="col-po"></td>
+                <td class="col-line"></td>
+                <td class="col-partno"></td>
+                <td class="col-partname"></td>
+                <td class="col-invqty"></td>
+                <td class="col-domqty"></td>
+                <td class="col-expqty"></td>
+                <td class="col-delqty"></td>
+                <td class="col-remark"></td>
+              </tr>
+              {% endfor %}
+
+              <!-- Total Row -->
+              <tr class="row-total">
+                <td colspan="9" class="total-title-cell">Total</td>
+                <td class="total-qty-cell">{{ label.total_delivery_qty }}</td>
+                <td class="col-remark"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Footer Signature Section -->
+        <div class="signature-container">
+          <div class="signature-title">ลงชื่อผู้ออกเอกสาร</div>
+          <div class="signature-line">____________________</div>
+          <div>(&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)</div>
+          <div class="signature-company">KOCH</div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <script>
+    function onRackFilterChange(val) {
+      const url = new URL(window.location.href);
+      if (val === 'ALL') {
+        url.searchParams.delete('rack_no');
+      } else {
+        url.searchParams.set('rack_no', val);
+      }
+      window.location.href = url.toString();
+    }
+  </script>
+</body>
+</html>
