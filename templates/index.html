@@ -4496,6 +4496,7 @@
 
         let html = '';
         recentScansData.forEach(s => {
+          const timeStr = s.timestamp ? (s.timestamp.split(' ')[1] || s.timestamp) : '-';
           const isOk = s.is_box_valid && s.remark !== 'OVERPACK';
           const isWaitPo = s.invoice_no === 'WAIT_PO' || s.remark === 'WAIT_PO' || s.po_no === 'WAIT_PO' || (s.po_no === 0 && s.line === 0);
           const poLineDisplay = isWaitPo
