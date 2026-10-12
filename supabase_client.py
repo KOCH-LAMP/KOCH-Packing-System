@@ -219,17 +219,75 @@ def sync_all(direction="bidirectional"):
                         pulled_batches = len(rows_to_pull)
 
             # ------------------------------------------------------------------
-            # 2. Sync pack_scans
+            # 2. Sync deleted_pack_scans (Tombstones - prevents resurrecting deleted scans)
             # ------------------------------------------------------------------
-            s_cur.execute("SELECT id FROM pack_scans;")
-            local_ps_ids = set(r[0] for r in s_cur.fetchall())
+            s_cur.execute("""
+                CREATE TABLE IF NOT EXISTS deleted_pack_scans (
+                    id INTEGER PRIMARY KEY,
+                    deleted_at TEXT
+                );
+            """)
+            p_cur.execute("""
+                CREATE TABLE IF NOT EXISTS deleted_pack_scans (
+                    id BIGINT PRIMARY KEY,
+                    deleted_at TEXT
+                );
+            """)
 
-            p_cur.execute("SELECT id FROM pack_scans;")
-            cloud_ps_ids = set(r[0] for r in p_cur.fetchall())
+            s_cur.execute("SELECT id FROM deleted_pack_scans;")
+            local_del_ids = set(r[0] for r in s_cur.fetchall())
+
+            p_cur.execute("SELECT id FROM deleted_pack_scans;")
+            cloud_del_ids = set(r[0] for r in p_cur.fetchall())
+
+            now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+            # Push tombstones to cloud
+            missing_in_cloud_del = local_del_ids - cloud_del_ids
+            if missing_in_cloud_del:
+                del_tuples = [(did, now_str) for did in missing_in_cloud_del]
+                extras.execute_batch(
+                    p_cur,
+                    "INSERT INTO deleted_pack_scans (id, deleted_at) VALUES (%s, %s) ON CONFLICT (id) DO NOTHING",
+                    del_tuples
+                )
+                p_cur.execute("DELETE FROM pack_scans WHERE id = ANY(%s)", (list(missing_in_cloud_del),))
+
+            # Pull tombstones to local
+            missing_in_local_del = cloud_del_ids - local_del_ids
+            if missing_in_local_del:
+                s_del_tuples = [(did, now_str) for did in missing_in_local_del]
+                s_cur.executemany(
+                    "INSERT OR IGNORE INTO deleted_pack_scans (id, deleted_at) VALUES (?, ?)",
+                    s_del_tuples
+                )
+                del_placeholders = ",".join("?" for _ in missing_in_local_del)
+                s_cur.execute(f"DELETE FROM pack_scans WHERE id IN ({del_placeholders})", list(missing_in_local_del))
+                s_conn.commit()
+
+            all_del_ids = local_del_ids | cloud_del_ids
+
+            # Ensure any tombstoned record is cleaned from pack_scans on both sides
+            if all_del_ids:
+                p_cur.execute("DELETE FROM pack_scans WHERE id = ANY(%s)", (list(all_del_ids),))
+                del_p = ",".join("?" for _ in all_del_ids)
+                s_cur.execute(f"DELETE FROM pack_scans WHERE id IN ({del_p})", list(all_del_ids))
+                s_conn.commit()
+
+            # ------------------------------------------------------------------
+            # 3. Sync pack_scans (Excluding tombstones, and syncing qty/rack updates)
+            # ------------------------------------------------------------------
+            s_cur.execute("SELECT id, qty, rack_no, timestamp FROM pack_scans;")
+            local_ps_map = {r[0]: (r[1], r[2], str(r[3] or "")) for r in s_cur.fetchall() if r[0] not in all_del_ids}
+            local_ps_ids = set(local_ps_map.keys())
+
+            p_cur.execute("SELECT id, qty, rack_no, timestamp FROM pack_scans;")
+            cloud_ps_map = {r[0]: (r[1], r[2], str(r[3] or "")) for r in p_cur.fetchall() if r[0] not in all_del_ids}
+            cloud_ps_ids = set(cloud_ps_map.keys())
 
             # Push missing to cloud
             if direction in ("bidirectional", "push_to_cloud"):
-                missing_in_cloud_ps = local_ps_ids - cloud_ps_ids
+                missing_in_cloud_ps = (local_ps_ids - cloud_ps_ids) - all_del_ids
                 if missing_in_cloud_ps:
                     placeholders = ",".join("?" for _ in missing_in_cloud_ps)
                     s_cur.execute(f"""
@@ -266,7 +324,7 @@ def sync_all(direction="bidirectional"):
 
             # Pull missing to local
             if direction in ("bidirectional", "pull_from_cloud"):
-                missing_in_local_ps = cloud_ps_ids - local_ps_ids
+                missing_in_local_ps = (cloud_ps_ids - local_ps_ids) - all_del_ids
                 if missing_in_local_ps:
                     p_cur.execute(f"""
                         SELECT id, timestamp, invoice_no, po_no, line, part_scan, 
@@ -285,6 +343,26 @@ def sync_all(direction="bidirectional"):
                         """, rows_to_pull)
                         s_conn.commit()
                         pulled_scans = len(rows_to_pull)
+
+            # Bidirectional sync of updated qty or rack_no on existing records
+            common_ids = (local_ps_ids & cloud_ps_ids) - all_del_ids
+            for cid in common_ids:
+                l_qty, l_rack, l_ts = local_ps_map[cid]
+                c_qty, c_rack, c_ts = cloud_ps_map[cid]
+                if (l_qty, l_rack) != (c_qty, c_rack):
+                    if l_ts >= c_ts:
+                        # Local is newer: push update to cloud
+                        p_cur.execute(
+                            "UPDATE pack_scans SET qty = %s, rack_no = %s, timestamp = %s WHERE id = %s",
+                            (l_qty, l_rack, l_ts, cid)
+                        )
+                    else:
+                        # Cloud is newer: pull update to local
+                        s_cur.execute(
+                            "UPDATE pack_scans SET qty = ?, rack_no = ?, timestamp = ? WHERE id = ?",
+                            (c_qty, c_rack, c_ts, cid)
+                        )
+            s_conn.commit()
 
             # Fix sequences in postgres
             p_cur.execute("""
@@ -411,18 +489,74 @@ def async_push_receive_batch(batch_dict):
     threading.Thread(target=_worker, daemon=True).start()
 
 
-def async_delete_pack_scan(scan_id):
-    """Asynchronously deletes a scan in Supabase."""
+def record_deleted_pack_scans(scan_ids):
+    """
+    Permanently records deleted scan IDs into deleted_pack_scans tombstone table
+    in both local SQLite and Supabase PostgreSQL, and deletes them from pack_scans.
+    Guarantees that deleted scans will NEVER be restored by auto-sync.
+    """
+    if not scan_ids:
+        return
+    clean_ids = []
+    for x in scan_ids:
+        try:
+            clean_ids.append(int(x))
+        except (ValueError, TypeError):
+            pass
+    if not clean_ids:
+        return
+
+    now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    # 1. Local SQLite
+    try:
+        s_conn = sqlite3.connect(SQLITE_DB_PATH)
+        s_cur = s_conn.cursor()
+        s_cur.execute("""
+            CREATE TABLE IF NOT EXISTS deleted_pack_scans (
+                id INTEGER PRIMARY KEY,
+                deleted_at TEXT
+            );
+        """)
+        s_cur.executemany(
+            "INSERT OR IGNORE INTO deleted_pack_scans (id, deleted_at) VALUES (?, ?)",
+            [(x, now_str) for x in clean_ids]
+        )
+        placeholders = ",".join("?" for _ in clean_ids)
+        s_cur.execute(f"DELETE FROM pack_scans WHERE id IN ({placeholders})", clean_ids)
+        s_conn.commit()
+        s_conn.close()
+    except Exception as e:
+        print(f"[SupabaseClient] Error recording tombstones in SQLite: {e}")
+
+    # 2. Supabase Cloud (async worker)
     def _worker():
         try:
-            conn = get_supabase_conn(timeout=4)
-            cur = conn.cursor()
-            cur.execute("DELETE FROM pack_scans WHERE id = %s;", (scan_id,))
-            conn.commit()
-            conn.close()
-        except Exception:
-            pass
+            p_conn = get_supabase_conn(timeout=5)
+            p_cur = p_conn.cursor()
+            p_cur.execute("""
+                CREATE TABLE IF NOT EXISTS deleted_pack_scans (
+                    id BIGINT PRIMARY KEY,
+                    deleted_at TEXT
+                );
+            """)
+            extras.execute_batch(
+                p_cur,
+                "INSERT INTO deleted_pack_scans (id, deleted_at) VALUES (%s, %s) ON CONFLICT (id) DO NOTHING",
+                [(x, now_str) for x in clean_ids]
+            )
+            p_cur.execute("DELETE FROM pack_scans WHERE id = ANY(%s)", (clean_ids,))
+            p_conn.commit()
+            p_conn.close()
+        except Exception as e:
+            print(f"[SupabaseClient] Error recording tombstones in Supabase: {e}")
+
     threading.Thread(target=_worker, daemon=True).start()
+
+
+def async_delete_pack_scan(scan_id):
+    """Asynchronously deletes a scan in Supabase and records tombstone."""
+    record_deleted_pack_scans([scan_id])
 
 
 def async_delete_receive_batch(batch_id):

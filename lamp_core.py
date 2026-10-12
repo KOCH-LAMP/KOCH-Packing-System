@@ -225,6 +225,14 @@ class LampDataManager:
             CREATE UNIQUE INDEX IF NOT EXISTS idx_receive_batches_unique_grn 
             ON receive_batches (grn);
         """)
+
+        # Table 3: Deleted Pack Scans (Tombstones to permanently prevent resurrecting deleted scans)
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS deleted_pack_scans (
+                id INTEGER PRIMARY KEY,
+                deleted_at TEXT
+            );
+        """)
         conn.commit()
         conn.close()
 
@@ -1837,13 +1845,19 @@ class LampDataManager:
             conn.close()
             return {"status": "ERROR", "message": f"ไม่พบรายการสแกนใน Rack {rack}"}
 
+        cur.execute(f"SELECT id FROM pack_scans WHERE {where_sql}", params)
+        del_ids = [r[0] for r in cur.fetchall()]
+
         cur.execute(f"DELETE FROM pack_scans WHERE {where_sql}", params)
         conn.commit()
         conn.close()
 
         try:
             import supabase_client
-            supabase_client.trigger_sync()
+            if del_ids:
+                supabase_client.record_deleted_pack_scans(del_ids)
+            else:
+                supabase_client.trigger_sync()
         except Exception:
             pass
 
@@ -1881,12 +1895,13 @@ class LampDataManager:
             conn.close()
             return {"status": "ERROR", "message": f"ไม่พบ Part {part} ใน Rack {rack}"}
 
+        now_ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         changes = []
         # Move to new rack
         if new_rack_no is not None:
             nr = str(new_rack_no).strip()
             if nr and nr != rack:
-                cur.execute(f"UPDATE pack_scans SET rack_no = ? WHERE {where_sql}", [nr] + params)
+                cur.execute(f"UPDATE pack_scans SET rack_no = ?, timestamp = ? WHERE {where_sql}", [nr, now_ts] + params)
                 changes.append(f"ย้ายไป Rack {nr}")
 
         # Update quantity
@@ -1900,12 +1915,12 @@ class LampDataManager:
                     changes.append("ลบรายการ (จำนวนเป็น 0)")
                 else:
                     if len(records) == 1:
-                        cur.execute("UPDATE pack_scans SET qty = ? WHERE id = ?", (nq, records[0][0]))
+                        cur.execute("UPDATE pack_scans SET qty = ?, timestamp = ? WHERE id = ?", (nq, now_ts, records[0][0]))
                     else:
                         del_ids = [r[0] for r in records[1:]]
-                        cur.execute("UPDATE pack_scans SET qty = ? WHERE id = ?", (nq, records[0][0]))
-                        for rec in records[1:]:
-                            cur.execute("DELETE FROM pack_scans WHERE id = ?", (rec[0],))
+                        cur.execute("UPDATE pack_scans SET qty = ?, timestamp = ? WHERE id = ?", (nq, now_ts, records[0][0]))
+                        del_placeholders = ",".join("?" for _ in del_ids)
+                        cur.execute(f"DELETE FROM pack_scans WHERE id IN ({del_placeholders})", del_ids)
                     changes.append(f"เปลี่ยนจำนวนเป็น {nq:,} ชิ้น")
             except (ValueError, TypeError):
                 pass
@@ -1913,26 +1928,30 @@ class LampDataManager:
         conn.commit()
         conn.close()
 
-        # Direct Supabase update/delete to prevent cloud sync from reverting
+        # Direct Supabase update and tombstone registration
         try:
             import supabase_client
-            conn_supa = supabase_client.get_supabase_conn(timeout=4)
-            cur_supa = conn_supa.cursor()
-            if new_rack_no is not None:
-                nr = str(new_rack_no).strip()
-                if nr and nr != rack:
-                    cur_supa.execute("UPDATE pack_scans SET rack_no = %s WHERE id = %s", (nr, records[0][0]))
-            if new_qty is not None:
-                nq = int(new_qty)
-                if nq <= 0:
-                    if del_ids:
-                        cur_supa.execute("DELETE FROM pack_scans WHERE id = ANY(%s)", (del_ids,))
-                else:
-                    cur_supa.execute("UPDATE pack_scans SET qty = %s WHERE id = %s", (nq, records[0][0]))
-                    if del_ids:
-                        cur_supa.execute("DELETE FROM pack_scans WHERE id = ANY(%s)", (del_ids,))
-            conn_supa.commit()
-            conn_supa.close()
+            if del_ids:
+                supabase_client.record_deleted_pack_scans(del_ids)
+
+            def _supa_update():
+                try:
+                    conn_supa = supabase_client.get_supabase_conn(timeout=4)
+                    cur_supa = conn_supa.cursor()
+                    if new_rack_no is not None:
+                        nr = str(new_rack_no).strip()
+                        if nr and nr != rack:
+                            cur_supa.execute("UPDATE pack_scans SET rack_no = %s, timestamp = %s WHERE id = %s", (nr, now_ts, records[0][0]))
+                    if new_qty is not None:
+                        nq = int(new_qty)
+                        if nq > 0:
+                            cur_supa.execute("UPDATE pack_scans SET qty = %s, timestamp = %s WHERE id = %s", (nq, now_ts, records[0][0]))
+                    conn_supa.commit()
+                    conn_supa.close()
+                except Exception:
+                    pass
+            import threading
+            threading.Thread(target=_supa_update, daemon=True).start()
         except Exception:
             pass
 
@@ -1973,15 +1992,11 @@ class LampDataManager:
         conn.commit()
         conn.close()
 
-        # Direct Supabase delete
+        # Direct Supabase delete + tombstone registration
         try:
             import supabase_client
             if deleted_ids:
-                conn_supa = supabase_client.get_supabase_conn(timeout=4)
-                cur_supa = conn_supa.cursor()
-                cur_supa.execute("DELETE FROM pack_scans WHERE id = ANY(%s)", (deleted_ids,))
-                conn_supa.commit()
-                conn_supa.close()
+                supabase_client.record_deleted_pack_scans(deleted_ids)
         except Exception:
             pass
 
