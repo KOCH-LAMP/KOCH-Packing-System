@@ -1890,16 +1890,19 @@ class LampDataManager:
                 changes.append(f"ย้ายไป Rack {nr}")
 
         # Update quantity
+        del_ids = []
         if new_qty is not None:
             try:
                 nq = int(new_qty)
                 if nq <= 0:
+                    del_ids = [r[0] for r in records]
                     cur.execute(f"DELETE FROM pack_scans WHERE {where_sql}", params)
                     changes.append("ลบรายการ (จำนวนเป็น 0)")
                 else:
                     if len(records) == 1:
                         cur.execute("UPDATE pack_scans SET qty = ? WHERE id = ?", (nq, records[0][0]))
                     else:
+                        del_ids = [r[0] for r in records[1:]]
                         cur.execute("UPDATE pack_scans SET qty = ? WHERE id = ?", (nq, records[0][0]))
                         for rec in records[1:]:
                             cur.execute("DELETE FROM pack_scans WHERE id = ?", (rec[0],))
@@ -1910,9 +1913,26 @@ class LampDataManager:
         conn.commit()
         conn.close()
 
+        # Direct Supabase update/delete to prevent cloud sync from reverting
         try:
             import supabase_client
-            supabase_client.trigger_sync()
+            conn_supa = supabase_client.get_supabase_conn(timeout=4)
+            cur_supa = conn_supa.cursor()
+            if new_rack_no is not None:
+                nr = str(new_rack_no).strip()
+                if nr and nr != rack:
+                    cur_supa.execute("UPDATE pack_scans SET rack_no = %s WHERE id = %s", (nr, records[0][0]))
+            if new_qty is not None:
+                nq = int(new_qty)
+                if nq <= 0:
+                    if del_ids:
+                        cur_supa.execute("DELETE FROM pack_scans WHERE id = ANY(%s)", (del_ids,))
+                else:
+                    cur_supa.execute("UPDATE pack_scans SET qty = %s WHERE id = %s", (nq, records[0][0]))
+                    if del_ids:
+                        cur_supa.execute("DELETE FROM pack_scans WHERE id = ANY(%s)", (del_ids,))
+            conn_supa.commit()
+            conn_supa.close()
         except Exception:
             pass
 
@@ -1946,13 +1966,22 @@ class LampDataManager:
             conn.close()
             return {"status": "ERROR", "message": f"ไม่พบ Part {part} ใน Rack {rack}"}
 
+        cur.execute(f"SELECT id FROM pack_scans WHERE {where_sql}", params)
+        deleted_ids = [r[0] for r in cur.fetchall()]
+
         cur.execute(f"DELETE FROM pack_scans WHERE {where_sql}", params)
         conn.commit()
         conn.close()
 
+        # Direct Supabase delete
         try:
             import supabase_client
-            supabase_client.trigger_sync()
+            if deleted_ids:
+                conn_supa = supabase_client.get_supabase_conn(timeout=4)
+                cur_supa = conn_supa.cursor()
+                cur_supa.execute("DELETE FROM pack_scans WHERE id = ANY(%s)", (deleted_ids,))
+                conn_supa.commit()
+                conn_supa.close()
         except Exception:
             pass
 
