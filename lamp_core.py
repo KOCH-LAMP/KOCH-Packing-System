@@ -220,6 +220,11 @@ class LampDataManager:
                 remark TEXT
             )
         """)
+        # Unique Index on GRN to prevent duplicate receives
+        cur.execute("""
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_receive_batches_unique_grn 
+            ON receive_batches (grn);
+        """)
         conn.commit()
         conn.close()
 
@@ -315,42 +320,13 @@ class LampDataManager:
                         "receive_qty": rec_qty,
                     })
 
-        # Seed receive_batches table if empty and Receive History exists
-        self.sync_receive_history_to_db()
+        # Receive History is retained in memory (self.receive_history) for FIFO matching
+        # Historical batches must NOT be dumped into receive_batches to prevent PO duplication.
+        pass
 
     def sync_receive_history_to_db(self):
-        """Pre-populates the database with Receive History records if table is empty."""
-        conn = sqlite3.connect(self.db_path)
-        cur = conn.cursor()
-        cur.execute("SELECT COUNT(*) FROM receive_batches")
-        cnt = cur.fetchone()[0]
-        if cnt == 0 and self.receive_history:
-            # Insert historical receives
-            now_iso = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            batch_data = []
-            for r in self.receive_history:
-                batch_data.append((
-                    now_iso,
-                    r["grn"],
-                    r["receive_date"],
-                    r["invoice_no"],
-                    r["po_no"],
-                    r["line"],
-                    r["part_no"],
-                    r["part_name"],
-                    r["receive_qty"],
-                    "",  # kanban
-                    "",  # lot
-                    "",  # rack
-                    "SYNC_FROM_HISTORY",
-                ))
-            cur.executemany("""
-                INSERT INTO receive_batches 
-                (timestamp, grn, receive_date, invoice_no, po_no, line, part_no, part_name, qty_received, kanban, lot, rack_no, raw_scan)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, batch_data)
-            conn.commit()
-        conn.close()
+        """Deprecated: Historical receives are not seeded to prevent duplicate PO quantities."""
+        pass
 
     def get_bom_spec(self, part_no: str) -> dict:
         """
@@ -468,19 +444,20 @@ class LampDataManager:
         now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         date_today = datetime.datetime.now().strftime("%d-%m-%Y")
 
+        ts_suffix = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
         is_wait_po = (str(invoice_no or "").upper() == "WAIT_PO" or str(po_no or "").upper() == "WAIT_PO")
         if is_wait_po:
             target_po = 0
             target_line = 0
             target_inv = "WAIT_PO"
-            grn = "GRN_WAIT_PO"
+            grn = f"GRN_WAIT_PO_{ts_suffix}"
             status_msg = "บันทึกรับเข้าสำเร็จ (Status: Wait PO)"
             is_linked = False
         elif link_po_later:
             target_po = 0
             target_line = 0
             target_inv = "PENDING"
-            grn = "GRN_PENDING"
+            grn = f"GRN_PENDING_{ts_suffix}"
             status_msg = "บันทึกรับเข้าสำเร็จ (รอเชื่อมต่อ PO)"
             is_linked = False
         else:
@@ -488,7 +465,7 @@ class LampDataManager:
                 target_po = int(po_no)
                 target_line = int(line or 0)
                 target_inv = str(invoice_no or "")
-                grn = "GRN_DIRECT"
+                grn = f"GRN_DIR_{ts_suffix}"
                 status_msg = f"บันทึกรับเข้าและผูก PO {target_po} เรียบร้อย"
                 is_linked = True
             else:
@@ -505,7 +482,7 @@ class LampDataManager:
                 target_po = 0
                 target_line = 0
                 target_inv = invoice_no or ""
-                grn = "GRN_SCAN"
+                grn = f"GRN_SCAN_{ts_suffix}"
 
                 if candidates:
                     first_c = candidates[0]
@@ -522,6 +499,10 @@ class LampDataManager:
 
         conn = sqlite3.connect(self.db_path)
         cur = conn.cursor()
+        cur.execute("SELECT 1 FROM receive_batches WHERE grn = ?", (grn,))
+        if cur.fetchone():
+            grn = f"{grn}_{ts_suffix}"
+
         cur.execute("""
             INSERT INTO receive_batches
             (timestamp, grn, receive_date, invoice_no, po_no, line, part_no, part_name, qty_received, kanban, lot, rack_no, raw_scan)
@@ -960,24 +941,30 @@ class LampDataManager:
 
         conn = sqlite3.connect(self.db_path)
         cur = conn.cursor()
-
-        # Query total received by (invoice_no, po_no, line, part_no) (linked batches only)
-        rec_query = """
-            SELECT invoice_no, po_no, line, part_no, part_name, SUM(qty_received) as total_received
-            FROM receive_batches
-            WHERE (po_no IS NOT NULL AND po_no > 0 AND invoice_no != 'PENDING' AND invoice_no != '')
-        """
+        # Query total received by (invoice_no, po_no, line, part_no) (deduplicating by GRN to prevent double count)
+        where_conds = ["(po_no IS NOT NULL AND po_no > 0 AND invoice_no != 'PENDING' AND invoice_no != '')"]
         params = []
         if po_no and str(po_no) != "ALL":
-            rec_query += " AND po_no = ?"
+            where_conds.append("po_no = ?")
             params.append(int(po_no))
         if invoice_no and str(invoice_no) != "ALL":
-            rec_query += " AND invoice_no = ?"
+            where_conds.append("invoice_no = ?")
             params.append(str(invoice_no))
         if part_no:
-            rec_query += " AND part_no = ?"
+            where_conds.append("part_no = ?")
             params.append(str(part_no))
-        rec_query += " GROUP BY invoice_no, po_no, line, part_no"
+        where_str = " AND ".join(where_conds)
+
+        rec_query = f"""
+            SELECT invoice_no, po_no, line, part_no, part_name, SUM(qty_received) as total_received
+            FROM (
+                SELECT invoice_no, po_no, line, part_no, part_name, qty_received
+                FROM receive_batches
+                WHERE {where_str}
+                GROUP BY COALESCE(NULLIF(grn, ''), id)
+            )
+            GROUP BY invoice_no, po_no, line, part_no
+        """
 
         cur.execute(rec_query, params)
         rec_rows = cur.fetchall()
@@ -2063,8 +2050,12 @@ class LampDataManager:
         query = f"""
             WITH line_rec AS (
                 SELECT po_no, invoice_no, line, part_no, part_name, SUM(qty_received) as rec_qty
-                FROM receive_batches
-                WHERE po_no IS NOT NULL AND po_no > 0
+                FROM (
+                    SELECT po_no, invoice_no, line, part_no, part_name, qty_received
+                    FROM receive_batches
+                    WHERE po_no IS NOT NULL AND po_no > 0
+                    GROUP BY COALESCE(NULLIF(grn, ''), id)
+                )
                 GROUP BY po_no, invoice_no, line, part_no
             ),
             line_pack AS (
@@ -2184,8 +2175,12 @@ class LampDataManager:
         cur.execute("""
             WITH line_rec AS (
                 SELECT po_no, invoice_no, line, part_no, SUM(qty_received) as rec_qty
-                FROM receive_batches
-                WHERE po_no IS NOT NULL AND po_no > 0
+                FROM (
+                    SELECT po_no, invoice_no, line, part_no, qty_received
+                    FROM receive_batches
+                    WHERE po_no IS NOT NULL AND po_no > 0
+                    GROUP BY COALESCE(NULLIF(grn, ''), id)
+                )
                 GROUP BY po_no, invoice_no, line, part_no
             ),
             line_pack AS (
@@ -2311,8 +2306,12 @@ class LampDataManager:
         cur = conn.cursor()
         cur.execute("""
             SELECT invoice_no, COUNT(*) as cnt, SUM(qty_received) as total_qty
-            FROM receive_batches
-            WHERE invoice_no IS NOT NULL AND invoice_no != '' AND invoice_no != 'PENDING' AND invoice_no != '-'
+            FROM (
+                SELECT invoice_no, qty_received
+                FROM receive_batches
+                WHERE invoice_no IS NOT NULL AND invoice_no != '' AND invoice_no != 'PENDING' AND invoice_no != '-'
+                GROUP BY COALESCE(NULLIF(grn, ''), id)
+            )
             GROUP BY invoice_no
             ORDER BY total_qty DESC
         """)

@@ -133,34 +133,40 @@ def sync_all(direction="bidirectional"):
             pulled_scans = 0
 
             # ------------------------------------------------------------------
-            # 1. Sync receive_batches
+            # 1. Sync receive_batches (Deduplicated by GRN)
             # ------------------------------------------------------------------
-            s_cur.execute("SELECT id FROM receive_batches;")
-            local_rb_ids = set(r[0] for r in s_cur.fetchall())
+            s_cur.execute("SELECT id, grn FROM receive_batches;")
+            local_rb_rows = s_cur.fetchall()
+            local_rb_grns = set(r[1] for r in local_rb_rows if r[1])
+            local_rb_ids = set(r[0] for r in local_rb_rows)
 
-            p_cur.execute("SELECT id FROM receive_batches;")
-            cloud_rb_ids = set(r[0] for r in p_cur.fetchall())
+            p_cur.execute("SELECT id, grn FROM receive_batches;")
+            cloud_rb_rows = p_cur.fetchall()
+            cloud_rb_grns = set(r[1] for r in cloud_rb_rows if r[1])
+            cloud_rb_ids = set(r[0] for r in cloud_rb_rows)
 
             # Push missing to cloud
             if direction in ("bidirectional", "push_to_cloud"):
-                missing_in_cloud_rb = local_rb_ids - cloud_rb_ids
-                if missing_in_cloud_rb:
-                    placeholders = ",".join("?" for _ in missing_in_cloud_rb)
+                missing_in_cloud_ids = [
+                    r[0] for r in local_rb_rows 
+                    if (r[1] and r[1] not in cloud_rb_grns) or (not r[1] and r[0] not in cloud_rb_ids)
+                ]
+                if missing_in_cloud_ids:
+                    placeholders = ",".join("?" for _ in missing_in_cloud_ids)
                     s_cur.execute(f"""
-                        SELECT id, timestamp, grn, receive_date, invoice_no, po_no, line, 
+                        SELECT timestamp, grn, receive_date, invoice_no, po_no, line, 
                                part_no, part_name, qty_received, kanban, lot, rack_no, raw_scan 
                         FROM receive_batches WHERE id IN ({placeholders})
-                    """, list(missing_in_cloud_rb))
+                    """, missing_in_cloud_ids)
                     rows_to_push = s_cur.fetchall()
                     if rows_to_push:
                         p_sql = """
                             INSERT INTO receive_batches 
-                            (id, timestamp, grn, receive_date, invoice_no, po_no, line, 
+                            (timestamp, grn, receive_date, invoice_no, po_no, line, 
                              part_no, part_name, qty_received, kanban, lot, rack_no, raw_scan)
-                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                            ON CONFLICT (id) DO UPDATE SET
+                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                            ON CONFLICT (grn) WHERE (grn IS NOT NULL AND grn <> '') DO UPDATE SET
                                 timestamp = EXCLUDED.timestamp,
-                                grn = EXCLUDED.grn,
                                 receive_date = EXCLUDED.receive_date,
                                 invoice_no = EXCLUDED.invoice_no,
                                 po_no = EXCLUDED.po_no,
@@ -178,20 +184,36 @@ def sync_all(direction="bidirectional"):
 
             # Pull missing to local
             if direction in ("bidirectional", "pull_from_cloud"):
-                missing_in_local_rb = cloud_rb_ids - local_rb_ids
-                if missing_in_local_rb:
+                missing_in_local_ids = [
+                    r[0] for r in cloud_rb_rows 
+                    if (r[1] and r[1] not in local_rb_grns) or (not r[1] and r[0] not in local_rb_ids)
+                ]
+                if missing_in_local_ids:
                     p_cur.execute(f"""
-                        SELECT id, timestamp, grn, receive_date, invoice_no, po_no, line, 
+                        SELECT timestamp, grn, receive_date, invoice_no, po_no, line, 
                                part_no, part_name, qty_received, kanban, lot, rack_no, raw_scan 
                         FROM receive_batches WHERE id = ANY(%s)
-                    """, (list(missing_in_local_rb),))
+                    """, (missing_in_local_ids,))
                     rows_to_pull = p_cur.fetchall()
                     if rows_to_pull:
                         s_cur.executemany("""
-                            INSERT OR REPLACE INTO receive_batches 
-                            (id, timestamp, grn, receive_date, invoice_no, po_no, line, 
+                            INSERT INTO receive_batches 
+                            (timestamp, grn, receive_date, invoice_no, po_no, line, 
                              part_no, part_name, qty_received, kanban, lot, rack_no, raw_scan)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            ON CONFLICT (grn) DO UPDATE SET
+                                timestamp = EXCLUDED.timestamp,
+                                receive_date = EXCLUDED.receive_date,
+                                invoice_no = EXCLUDED.invoice_no,
+                                po_no = EXCLUDED.po_no,
+                                line = EXCLUDED.line,
+                                part_no = EXCLUDED.part_no,
+                                part_name = EXCLUDED.part_name,
+                                qty_received = EXCLUDED.qty_received,
+                                kanban = EXCLUDED.kanban,
+                                lot = EXCLUDED.lot,
+                                rack_no = EXCLUDED.rack_no,
+                                raw_scan = EXCLUDED.raw_scan;
                         """, rows_to_pull)
                         s_conn.commit()
                         pulled_batches = len(rows_to_pull)
@@ -351,12 +373,11 @@ def async_push_receive_batch(batch_dict):
             cur = conn.cursor()
             cur.execute("""
                 INSERT INTO receive_batches (
-                    id, timestamp, grn, receive_date, invoice_no, po_no, line, 
+                    timestamp, grn, receive_date, invoice_no, po_no, line, 
                     part_no, part_name, qty_received, kanban, lot, rack_no, raw_scan
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                ON CONFLICT (id) DO UPDATE SET
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (grn) WHERE (grn IS NOT NULL AND grn <> '') DO UPDATE SET
                     timestamp = EXCLUDED.timestamp,
-                    grn = EXCLUDED.grn,
                     receive_date = EXCLUDED.receive_date,
                     invoice_no = EXCLUDED.invoice_no,
                     po_no = EXCLUDED.po_no,
@@ -369,7 +390,6 @@ def async_push_receive_batch(batch_dict):
                     rack_no = EXCLUDED.rack_no,
                     raw_scan = EXCLUDED.raw_scan;
             """, (
-                batch_dict.get("id"),
                 batch_dict.get("timestamp"),
                 batch_dict.get("grn"),
                 batch_dict.get("receive_date"),

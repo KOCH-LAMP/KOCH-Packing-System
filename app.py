@@ -100,6 +100,13 @@ def work_instruction():
     return render_template("wi.html")
 
 
+@app.route("/presentation")
+def presentation_route():
+    resp = make_response(send_file(os.path.join(BASE_DIR, "LAMP_Executive_Presentation.html")))
+    resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    return resp
+
+
 @app.route("/api/balance", methods=["GET"])
 def get_balance():
     po_param = request.args.get("po_no")
