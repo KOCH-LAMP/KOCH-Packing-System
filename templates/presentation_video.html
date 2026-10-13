@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>วิดีโอนำเสนอระบบ - KOCH LAMP Packing System</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+    body {
+      font-family: 'Prompt', 'Inter', sans-serif;
+    }
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(51, 65, 85, 0.6);
+    }
+    .gradient-title {
+      background: linear-gradient(135deg, #38bdf8 0%, #34d399 50%, #fbbf24 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="w-full px-6 py-4 flex items-center justify-between border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
+    <div class="flex items-center space-x-3">
+      <a href="/" class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-white font-bold shadow-lg shadow-emerald-500/20 hover:scale-105 transition">
+        <i class="fa-solid fa-boxes-packing text-lg"></i>
+      </a>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="font-bold text-base sm:text-lg tracking-wide">KOCH LAMP</h1>
+          <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-semibold border border-emerald-500/40">วิดีโอนำเสนอระบบ</span>
+        </div>
+        <p class="text-xs text-slate-400">Intelligent Packing & Delivery Verification System</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <a href="/" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-medium transition flex items-center gap-1.5">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>กลับหน้าระบบสแกน</span>
+      </a>
+      <a href="/presentation" class="px-3 py-1.5 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 text-xs sm:text-sm font-medium transition flex items-center gap-1.5">
+        <i class="fa-solid fa-file-powerpoint"></i>
+        <span>สไลด์นำเสนอ</span>
+      </a>
+      <a href="/download/presentation_video" class="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-emerald-600/30 transition flex items-center gap-2">
+        <i class="fa-solid fa-download"></i>
+        <span>ดาวน์โหลดวิดีโอ (MP4)</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-8">
+    
+    <!-- Hero Title -->
+    <div class="text-center max-w-3xl mx-auto space-y-2">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
+        <i class="fa-solid fa-circle-play animate-pulse text-emerald-400"></i>
+        <span>1080p Full HD Video Showcase with Voiceover</span>
+      </div>
+      <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight">
+        วิดีโอนำเสนอ <span class="gradient-title">KOCH LAMP Packing System</span>
+      </h2>
+      <p class="text-slate-400 text-sm sm:text-base">
+        สรุปจุดเด่น สถาปัตยกรรม Poka-Yoke ดิจิทัล และความคุ้มค่าระดับองค์กร พร้อมเสียงบรรยายภาษาไทย (2 นาทีจบครบทุกฟังก์ชัน)
+      </p>
+    </div>
+
+    <!-- Video Player + Chapters Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+      
+      <!-- Video Player (2 Cols on lg) -->
+      <div class="lg:col-span-2 glass-panel p-3 sm:p-4 rounded-2xl shadow-2xl space-y-4">
+        <div class="relative w-full aspect-video rounded-xl overflow-hidden bg-black shadow-inner border border-slate-700/60 group">
+          <video id="presVideo" controls class="w-full h-full object-contain" poster="/static/images/tag_sample_pack.jpg">
+            <source src="/static/KOCH_LAMP_System_Presentation.mp4" type="video/mp4">
+            เบราว์เซอร์ของคุณไม่รองรับการเล่นวิดีโอ HTML5
+          </video>
+        </div>
+
+        <!-- Video Controls Bar -->
+        <div class="flex flex-wrap items-center justify-between gap-3 px-2 pt-1 text-xs text-slate-400">
+          <div class="flex items-center gap-4">
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-clock text-emerald-400"></i> ความยาว: 1:57 นาที</span>
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-tv text-blue-400"></i> ความละเอียด: 1920x1080 (Full HD)</span>
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-volume-high text-amber-400"></i> เสียงบรรยายภาษาไทย</span>
+          </div>
+          <div>
+            <a href="/download/presentation_video" class="text-emerald-400 hover:text-emerald-300 font-medium inline-flex items-center gap-1">
+              <i class="fa-solid fa-file-arrow-down"></i> บันทึกไฟล์ (6.16 MB)
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Chapter List (1 Col on lg) -->
+      <div class="glass-panel p-5 rounded-2xl space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <h3 class="font-bold text-slate-200 text-sm sm:text-base flex items-center gap-2">
+            <i class="fa-solid fa-list-ol text-emerald-400"></i>
+            <span>สารบัญเนื้อหา (Chapters)</span>
+          </h3>
+          <span class="text-xs text-slate-400">คลิกเพื่อข้ามไปยังฉาก</span>
+        </div>
+
+        <div class="space-y-2 max-h-[460px] overflow-y-auto pr-1">
+          <button onclick="seekVideo(0)" class="chapter-btn w-full text-left p-2.5 rounded-xl hover:bg-slate-800/80 transition flex items-center justify-between group border border-transparent hover:border-slate-700">
+            <div>
+              <div class="text-xs font-semibold text-emerald-400">Scene 1 • 00:00</div>
+              <div class="text-sm font-medium text-slate-200 group-hover:text-emerald-300">ภาพรวม & วิสัยทัศน์ระบบ</div>
+            </div>
+            <i class="fa-solid fa-play text-xs text-slate-500 group-hover:text-emerald-400"></i>
+          </button>
+
+          <button onclick="seekVideo(15)" class="chapter-btn w-full text-left p-2.5 rounded-xl hover:bg-slate-800/80 transition flex items-center justify-between group border border-transparent hover:border-slate-700">
+            <div>
+              <div class="text-xs font-semibold text-rose-400">Scene 2 • 00:15</div>
+              <div class="text-sm font-medium text-slate-200 group-hover:text-rose-300">ความท้าทาย & Pain Points เดิม</div>
+            </div>
+            <i class="fa-solid fa-play text-xs text-slate-500 group-hover:text-rose-400"></i>
+          </button>
+
+          <button onclick="seekVideo(29)" class="chapter-btn w-full text-left p-2.5 rounded-xl hover:bg-slate-800/80 transition flex items-center justify-between group border border-transparent hover:border-slate-700">
+            <div>
+              <div class="text-xs font-semibold text-purple-400">Scene 3 • 00:29</div>
+              <div class="text-sm font-medium text-slate-200 group-hover:text-purple-300">หัวใจ Poka-Yoke 3 ขั้นตอน</div>
+            </div>
+            <i class="fa-solid fa-play text-xs text-slate-500 group-hover:text-purple-400"></i>
+          </button>
+
+          <button onclick="seekVideo(47)" class="chapter-btn w-full text-left p-2.5 rounded-xl hover:bg-slate-800/80 transition flex items-center justify-between group border border-transparent hover:border-slate-700">
+            <div>
+              <div class="text-xs font-semibold text-blue-400">Scene 4 • 00:47</div>
+              <div class="text-sm font-medium text-slate-200 group-hover:text-blue-300">ติดตามยอด PO Line & ตัดยอด Real-time</div>
+            </div>
+            <i class="fa-solid fa-play text-xs text-slate-500 group-hover:text-blue-400"></i>
+          </button>
+
+          <button onclick="seekVideo(62)" class="chapter-btn w-full text-left p-2.5 rounded-xl hover:bg-slate-800/80 transition flex items-center justify-between group border border-transparent hover:border-slate-700">
+            <div>
+              <div class="text-xs font-semibold text-amber-400">Scene 5 • 01:02</div>
+              <div class="text-sm font-medium text-slate-200 group-hover:text-amber-300">ระบบค้นหาและจัดการแร็คอัจฉริยะ</div>
+            </div>
+            <i class="fa-solid fa-play text-xs text-slate-500 group-hover:text-amber-400"></i>
+          </button>
+
+          <button onclick="seekVideo(76)" class="chapter-btn w-full text-left p-2.5 rounded-xl hover:bg-slate-800/80 transition flex items-center justify-between group border border-transparent hover:border-slate-700">
+            <div>
+              <div class="text-xs font-semibold text-teal-400">Scene 6 • 01:16</div>
+              <div class="text-sm font-medium text-slate-200 group-hover:text-teal-300">ออกเอกสารจัดส่งในคลิกเดียว</div>
+            </div>
+            <i class="fa-solid fa-play text-xs text-slate-500 group-hover:text-teal-400"></i>
+          </button>
+
+          <button onclick="seekVideo(89)" class="chapter-btn w-full text-left p-2.5 rounded-xl hover:bg-slate-800/80 transition flex items-center justify-between group border border-transparent hover:border-slate-700">
+            <div>
+              <div class="text-xs font-semibold text-indigo-400">Scene 7 • 01:29</div>
+              <div class="text-sm font-medium text-slate-200 group-hover:text-indigo-300">สถาปัตยกรรม Hybrid Cloud & Offline</div>
+            </div>
+            <i class="fa-solid fa-play text-xs text-slate-500 group-hover:text-indigo-400"></i>
+          </button>
+
+          <button onclick="seekVideo(106)" class="chapter-btn w-full text-left p-2.5 rounded-xl hover:bg-slate-800/80 transition flex items-center justify-between group border border-transparent hover:border-slate-700">
+            <div>
+              <div class="text-xs font-semibold text-emerald-400">Scene 8 • 01:46</div>
+              <div class="text-sm font-medium text-slate-200 group-hover:text-emerald-300">ความคุ้มค่าระดับองค์กร & ROI</div>
+            </div>
+            <i class="fa-solid fa-play text-xs text-slate-500 group-hover:text-emerald-400"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 High-Impact Feature Highlights -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="glass-panel p-5 rounded-2xl border-l-4 border-l-emerald-500 space-y-2">
+        <div class="text-2xl font-bold text-emerald-400">0% Defect</div>
+        <div class="font-semibold text-sm text-slate-200">ข้อผิดพลาดเป็นศูนย์</div>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          ระบบล็อกและส่งเสียงเตือนทันทีหากหยิบกล่องผิดขนาดหรือสแกนพาร์ทผิดรุ่น ป้องกันสินค้าผิดสเปกหลุดสู่ลูกค้า 100%
+        </p>
+      </div>
+
+      <div class="glass-panel p-5 rounded-2xl border-l-4 border-l-blue-500 space-y-2">
+        <div class="text-2xl font-bold text-blue-400">85% Faster</div>
+        <div class="font-semibold text-sm text-slate-200">ประหยัดเวลากระบวนการ</div>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          สร้าง Delivery Trip Sheet และ Delivery Note ได้ในคลิกเดียว ลดเวลาทำงานเอกสารจาก 30 นาทีเหลือไม่ถึง 1 นาที
+        </p>
+      </div>
+
+      <div class="glass-panel p-5 rounded-2xl border-l-4 border-l-purple-500 space-y-2">
+        <div class="text-2xl font-bold text-purple-400">24/7 Cloud</div>
+        <div class="font-semibold text-sm text-slate-200">มอนิเตอร์ได้ทุกที่</div>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          ซิงค์ข้อมูลขึ้น Supabase Cloud Real-time ผู้บริหารและหัวหน้างานเปิดดูยอดผ่านมือถือและแท็บเล็ตได้ตลอด 24 ชม.
+        </p>
+      </div>
+
+      <div class="glass-panel p-5 rounded-2xl border-l-4 border-l-amber-500 space-y-2">
+        <div class="text-2xl font-bold text-amber-400">0 บาท</div>
+        <div class="font-semibold text-sm text-slate-200">ต้นทุน Server เพิ่มเติม</div>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          ทำงานบน Cloud Server ฟรี (Render + Supabase PostgreSQL) ไม่มีค่าไลเซนส์ซอฟต์แวร์หรือค่าบำรุงรักษารายเดือน
+        </p>
+      </div>
+    </div>
+
+    <!-- Live Cloud System Link Card -->
+    <div class="glass-panel p-6 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 border border-emerald-500/30 bg-gradient-to-r from-slate-900 via-slate-900 to-emerald-950/40">
+      <div class="space-y-1 text-center sm:text-left">
+        <div class="font-bold text-base sm:text-lg text-slate-100 flex items-center justify-center sm:justify-start gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>ระบบออนไลน์พร้อมใช้งานจริงบนอินเทอร์เน็ต</span>
+        </div>
+        <p class="text-xs sm:text-sm text-slate-400">
+          ผู้บริหารสามารถทดลองเปิดใช้งานจริงผ่านสมาร์ทโฟนหรือคอมพิวเตอร์ได้ทันที
+        </p>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="https://koch-packing-system.onrender.com" target="_blank" class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/20 transition flex items-center gap-2">
+          <span>เปิดระบบออนไลน์</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full px-6 py-4 border-t border-slate-800 text-center text-xs text-slate-500">
+    KOCH LAMP Enterprise Packing & Delivery Verification System • Developed for Smart Factory Excellence
+  </footer>
+
+  <script>
+    const video = document.getElementById('presVideo');
+    function seekVideo(seconds) {
+      if (video) {
+        video.currentTime = seconds;
+        video.play();
+      }
+    }
+  </script>
+</body>
+</html>

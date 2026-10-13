@@ -25,25 +25,159 @@
   <script src="/static/qrcode.min.js"></script>
   <script>if(!window.QRCode){document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>');}</script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap');
+    
+    :root {
+      --font-base: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-display: 'Prompt', 'Sarabun', sans-serif;
+      --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+
     html, body {
-      font-family: 'Sarabun', sans-serif;
-      background-color: #f1f5f9;
+      font-family: var(--font-base);
+      background-color: #f8fafc;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(224, 231, 255, 0.45) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(219, 234, 254, 0.4) 0px, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(241, 245, 249, 0.7) 0px, transparent 50%);
+      background-attachment: fixed;
       overflow-x: hidden;
       max-width: 100vw;
       width: 100%;
       -webkit-text-size-adjust: 100%;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       touch-action: manipulation;
+      color: #1e293b;
     }
+
+    /* Dimensional Luxury Cards with Soft Glass Depth */
+    .luxury-card,
+    .bg-white.rounded-xl.shadow-sm.border.border-slate-200 {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(226, 232, 240, 0.9) !important;
+      border-radius: 1rem !important;
+      box-shadow: 
+        0 1px 3px 0 rgba(0, 0, 0, 0.03),
+        0 8px 24px -4px rgba(15, 23, 42, 0.05),
+        0 20px 25px -5px rgba(15, 23, 42, 0.02) !important;
+      transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease !important;
+    }
+    .luxury-card:hover,
+    .bg-white.rounded-xl.shadow-sm.border.border-slate-200:hover {
+      box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.04),
+        0 16px 32px -8px rgba(15, 23, 42, 0.09) !important;
+      border-color: rgba(148, 163, 184, 0.45) !important;
+    }
+
+    /* Header Frosted Glass Effect */
+    .glass-header {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.97) 50%, rgba(30, 58, 138, 0.96) 100%) !important;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+      box-shadow: 0 4px 25px -2px rgba(15, 23, 42, 0.35) !important;
+    }
+
+    /* Metric Cards in Status Strip */
+    .metric-card,
+    .bg-slate-50.border.border-slate-200.rounded-lg {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 250, 252, 0.90) 100%) !important;
+      border: 1px solid rgba(226, 232, 240, 0.85) !important;
+      border-radius: 0.875rem !important;
+      box-shadow: 0 2px 8px -1px rgba(15, 23, 42, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+    .metric-card:hover,
+    .bg-slate-50.border.border-slate-200.rounded-lg:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px -2px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+      border-color: rgba(203, 213, 225, 1) !important;
+    }
+
+    /* Camera Scanner High-Tech Viewfinder */
+    .scanner-container {
+      position: relative;
+      background: #090d16;
+      border: 1.5px solid rgba(71, 85, 105, 0.65);
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 
+        0 10px 30px -5px rgba(0, 0, 0, 0.5),
+        inset 0 0 40px rgba(0, 0, 0, 0.85),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+    }
+    .scanner-laser-line {
+      position: absolute;
+      left: 5%;
+      right: 5%;
+      height: 2.5px;
+      background: linear-gradient(90deg, transparent 0%, #10b981 15%, #34d399 50%, #10b981 85%, transparent 100%);
+      box-shadow: 0 0 12px 2px rgba(52, 211, 153, 0.85), 0 0 24px 4px rgba(16, 185, 129, 0.4);
+      animation: scanLaserAnim 2.2s ease-in-out infinite alternate;
+      z-index: 15;
+      pointer-events: none;
+    }
+    @keyframes scanLaserAnim {
+      0% { top: 10%; opacity: 0.75; }
+      50% { opacity: 1; }
+      100% { top: 90%; opacity: 0.75; }
+    }
+    .scanner-reticle-corner {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border-color: #34d399;
+      border-style: solid;
+      pointer-events: none;
+      z-index: 14;
+    }
+    .scanner-reticle-tl { top: 16px; left: 16px; border-width: 3px 0 0 3px; border-top-left-radius: 6px; }
+    .scanner-reticle-tr { top: 16px; right: 16px; border-width: 3px 3px 0 0; border-top-right-radius: 6px; }
+    .scanner-reticle-bl { bottom: 16px; left: 16px; border-width: 0 0 3px 3px; border-bottom-left-radius: 6px; }
+    .scanner-reticle-br { bottom: 16px; right: 16px; border-width: 0 3px 3px 0; border-bottom-right-radius: 6px; }
+
+    .autolight-pill {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 20;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    /* Input & Focus Styling */
     .scan-focus:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25); }
     .badge-completed { background-color: #dcfce7; color: #15803d; border: 1px solid #86efac; }
     .badge-progress { background-color: #fef9c3; color: #a16207; border: 1px solid #fde047; }
     .badge-pending { background-color: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
     .badge-overpack { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
 
-    /* Hide scrollbars for smooth touch scroll */
+    /* Custom Sleek Scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(241, 245, 249, 0.6); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.5); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.7); }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Fluid Auto-Resizing Layout Container across all devices */
+    main {
+      width: 100%;
+      max-width: 80rem;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: clamp(0.6rem, 2vw, 1.5rem);
+      padding-right: clamp(0.6rem, 2vw, 1.5rem);
+    }
+    @media (min-width: 1600px) {
+      main {
+        max-width: 90rem;
+      }
+    }
 
     /* Prevent mobile browser zoom jump when focusing input fields on iPhone */
     @media screen and (max-width: 768px) {
@@ -123,12 +257,12 @@
   </script>
 
   <!-- Top Navigation Bar -->
-  <header class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white shadow-lg sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between gap-2">
+  <header class="glass-header text-white sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2">
       <!-- Logo + App Name -->
       <div class="flex items-center space-x-2 sm:space-x-3 min-w-0">
-        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-600 flex items-center justify-center text-lg sm:text-xl font-bold shadow-inner shrink-0">
-          <i class="fa-solid fa-barcode"></i>
+        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-500 flex items-center justify-center text-lg sm:text-xl font-bold shadow-lg shadow-blue-500/30 shrink-0 border border-blue-400/30">
+          <i class="fa-solid fa-barcode text-white"></i>
         </div>
         <div class="min-w-0 truncate">
           <h1 class="text-sm sm:text-lg font-bold tracking-tight leading-tight truncate">LAMP Packing</h1>
@@ -195,6 +329,12 @@
           <span class="hidden sm:inline">คู่มือ WI</span>
         </a>
 
+        <!-- Video Presentation Button -->
+        <a href="/video" target="_blank" title="เปิดวิดีโอนำเสนอระบบ (1080p Full HD Video Showcase)" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white p-2 sm:px-2.5 sm:py-1.5 rounded-lg font-bold shadow flex items-center gap-1.5 transition text-xs border border-purple-400/40">
+          <i class="fa-solid fa-circle-play text-amber-300 animate-pulse"></i>
+          <span class="hidden lg:inline">วิดีโอนำเสนอ</span>
+        </a>
+
         <button onclick="refreshData()" title="รีเฟรชข้อมูล" class="bg-blue-600 hover:bg-blue-500 text-white p-2 sm:px-2.5 sm:py-1.5 rounded-lg font-medium shadow flex items-center gap-1.5 transition text-xs">
           <i class="fa-solid fa-arrows-rotate"></i>
           <span class="hidden md:inline">รีเฟรช</span>
@@ -203,7 +343,7 @@
     </div>
 
     <!-- Navigation Tabs: Desktop/Tablet Only (hidden on mobile; mobile uses bottom app navigation bar) -->
-    <div class="max-w-7xl mx-auto px-4 hidden md:flex space-x-1 border-t border-slate-800 text-sm font-medium">
+    <div class="max-w-7xl mx-auto px-4 lg:px-6 hidden md:flex space-x-1 border-t border-slate-800 text-sm font-medium">
       <button onclick="switchTab('pack')" id="tabBtn-pack" class="tab-btn px-4 py-2.5 border-b-2 border-yellow-400 text-yellow-300 flex items-center gap-2">
         <i class="fa-solid fa-box-open"></i>
         <span>1. สแกนเช็คการ Pack (Tag รูปที่ 2)</span>
@@ -228,95 +368,105 @@
   </header>
 
   <!-- Summary Status Strip -->
-  <div class="bg-white border-b border-slate-200 py-2 sm:py-3 shadow-sm">
+  <div class="bg-white/80 backdrop-blur-md border-b border-slate-200/90 py-2.5 sm:py-3.5 shadow-sm">
     <!-- Mobile Compact Horizontal Scroll Strip (sm:hidden) -->
     <div class="flex sm:hidden overflow-x-auto gap-2 px-3 py-1 no-scrollbar text-xs">
-      <div class="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 flex items-center gap-2 shrink-0">
-        <i class="fa-solid fa-boxes-packing text-blue-600 text-sm"></i>
+      <div class="bg-blue-50/90 border border-blue-200/80 rounded-xl px-2.5 py-1.5 flex items-center gap-2 shrink-0 shadow-xs">
+        <div class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs shadow-xs">
+          <i class="fa-solid fa-boxes-packing"></i>
+        </div>
         <div>
-          <span class="text-[10px] text-slate-500 block leading-tight">รับแล้ว</span>
-          <span id="statReceivedMob" class="font-bold text-slate-800 text-xs">0</span>
+          <span class="text-[10px] text-slate-500 block leading-tight font-medium">รับแล้ว</span>
+          <span id="statReceivedMob" class="font-bold text-slate-800 text-xs font-mono">0</span>
         </div>
       </div>
-      <div class="bg-emerald-50 border border-emerald-200 rounded-lg px-2.5 py-1.5 flex items-center gap-2 shrink-0">
-        <i class="fa-solid fa-check-double text-emerald-600 text-sm"></i>
+      <div class="bg-emerald-50/90 border border-emerald-200/80 rounded-xl px-2.5 py-1.5 flex items-center gap-2 shrink-0 shadow-xs">
+        <div class="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs shadow-xs">
+          <i class="fa-solid fa-check-double"></i>
+        </div>
         <div>
-          <span class="text-[10px] text-emerald-700 block leading-tight">แพ็คแล้ว</span>
-          <span id="statPackedMob" class="font-bold text-emerald-700 text-xs">0</span>
+          <span class="text-[10px] text-emerald-700 block leading-tight font-medium">แพ็คแล้ว</span>
+          <span id="statPackedMob" class="font-bold text-emerald-700 text-xs font-mono">0</span>
         </div>
       </div>
-      <div class="bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5 flex items-center gap-2 shrink-0">
-        <i class="fa-solid fa-clock-rotate-left text-amber-600 text-sm"></i>
+      <div class="bg-amber-50/90 border border-amber-200/80 rounded-xl px-2.5 py-1.5 flex items-center gap-2 shrink-0 shadow-xs">
+        <div class="w-6 h-6 rounded-lg bg-amber-600 text-white flex items-center justify-center text-xs shadow-xs">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+        </div>
         <div>
-          <span class="text-[10px] text-amber-700 block leading-tight">คงเหลือ</span>
-          <span id="statRemainingMob" class="font-bold text-amber-700 text-xs">0</span>
+          <span class="text-[10px] text-amber-700 block leading-tight font-medium">คงเหลือ</span>
+          <span id="statRemainingMob" class="font-bold text-amber-700 text-xs font-mono">0</span>
         </div>
       </div>
-      <div class="bg-indigo-50 border border-indigo-200 rounded-lg px-2.5 py-1.5 flex items-center gap-2 shrink-0">
-        <i class="fa-solid fa-percent text-indigo-600 text-sm"></i>
+      <div class="bg-indigo-50/90 border border-indigo-200/80 rounded-xl px-2.5 py-1.5 flex items-center gap-2 shrink-0 shadow-xs">
+        <div class="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs shadow-xs">
+          <i class="fa-solid fa-percent"></i>
+        </div>
         <div>
-          <span class="text-[10px] text-indigo-700 block leading-tight">คืบหน้า</span>
-          <span id="statPercentMob" class="font-bold text-indigo-700 text-xs">0%</span>
+          <span class="text-[10px] text-indigo-700 block leading-tight font-medium">คืบหน้า</span>
+          <span id="statPercentMob" class="font-bold text-indigo-700 text-xs font-mono">0%</span>
         </div>
       </div>
-      <div class="bg-purple-50 border border-purple-200 rounded-lg px-2.5 py-1.5 flex items-center gap-2 shrink-0">
-        <i class="fa-solid fa-box text-purple-600 text-sm"></i>
+      <div class="bg-purple-50/90 border border-purple-200/80 rounded-xl px-2.5 py-1.5 flex items-center gap-2 shrink-0 shadow-xs">
+        <div class="w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center text-xs shadow-xs">
+          <i class="fa-solid fa-box"></i>
+        </div>
         <div>
-          <span class="text-[10px] text-purple-700 block leading-tight">กล่อง</span>
-          <span id="statBoxesMob" class="font-bold text-purple-700 text-xs">0</span>
+          <span class="text-[10px] text-purple-700 block leading-tight font-medium">กล่อง</span>
+          <span id="statBoxesMob" class="font-bold text-purple-700 text-xs font-mono">0</span>
         </div>
       </div>
     </div>
 
     <!-- Desktop Grid (hidden on mobile, grid on sm+) -->
-    <div class="hidden sm:grid max-w-7xl mx-auto px-4 grid-cols-2 md:grid-cols-5 gap-3">
-      <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-lg">
+    <div class="hidden sm:grid max-w-7xl mx-auto px-4 lg:px-6 grid-cols-2 md:grid-cols-5 gap-3 sm:gap-3.5">
+      <div class="metric-card p-3 sm:p-3.5 flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center text-lg shadow-sm shadow-blue-500/20 shrink-0">
           <i class="fa-solid fa-boxes-packing"></i>
         </div>
-        <div>
+        <div class="min-w-0">
           <p class="text-xs text-slate-500 font-medium">ยอดรับทั้งหมด</p>
-          <p id="statReceived" class="text-lg font-bold text-slate-800">0</p>
+          <p id="statReceived" class="text-lg sm:text-xl font-bold font-mono text-slate-900 tracking-tight">0</p>
         </div>
       </div>
 
-      <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg">
+      <div class="metric-card p-3 sm:p-3.5 flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center text-lg shadow-sm shadow-emerald-500/20 shrink-0">
           <i class="fa-solid fa-check-double"></i>
         </div>
-        <div>
+        <div class="min-w-0">
           <p class="text-xs text-slate-500 font-medium">แพ็คเสร็จแล้ว</p>
-          <p id="statPacked" class="text-lg font-bold text-emerald-600">0</p>
+          <p id="statPacked" class="text-lg sm:text-xl font-bold font-mono text-emerald-600 tracking-tight">0</p>
         </div>
       </div>
 
-      <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-lg">
+      <div class="metric-card p-3 sm:p-3.5 flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center text-lg shadow-sm shadow-amber-500/20 shrink-0">
           <i class="fa-solid fa-clock-rotate-left"></i>
         </div>
-        <div>
+        <div class="min-w-0">
           <p class="text-xs text-slate-500 font-medium">คงเหลือต้องแพ็ค</p>
-          <p id="statRemaining" class="text-lg font-bold text-amber-600">0</p>
+          <p id="statRemaining" class="text-lg sm:text-xl font-bold font-mono text-amber-600 tracking-tight">0</p>
         </div>
       </div>
 
-      <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-lg">
+      <div class="metric-card p-3 sm:p-3.5 flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-sky-600 text-white flex items-center justify-center text-lg shadow-sm shadow-indigo-500/20 shrink-0">
           <i class="fa-solid fa-percent"></i>
         </div>
-        <div>
+        <div class="min-w-0">
           <p class="text-xs text-slate-500 font-medium">ความคืบหน้ารวม</p>
-          <p id="statPercent" class="text-lg font-bold text-indigo-600">0%</p>
+          <p id="statPercent" class="text-lg sm:text-xl font-bold font-mono text-indigo-600 tracking-tight">0%</p>
         </div>
       </div>
 
-      <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 flex items-center space-x-3 col-span-2 md:col-span-1">
-        <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-lg">
+      <div class="metric-card p-3 sm:p-3.5 flex items-center space-x-3 col-span-2 md:col-span-1">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-fuchsia-600 text-white flex items-center justify-center text-lg shadow-sm shadow-purple-500/20 shrink-0">
           <i class="fa-solid fa-box"></i>
         </div>
-        <div>
+        <div class="min-w-0">
           <p class="text-xs text-slate-500 font-medium">กล่อง Carton ที่ใช้</p>
-          <p id="statBoxes" class="text-lg font-bold text-purple-600">0 กล่อง</p>
+          <p id="statBoxes" class="text-lg sm:text-xl font-bold font-mono text-purple-600 tracking-tight">0 กล่อง</p>
         </div>
       </div>
     </div>
@@ -1225,28 +1375,90 @@
               </div>
 
               <!-- Camera Viewfinder Box (Collapsible) -->
-              <div id="packCameraBox" class="hidden p-3 sm:p-4 bg-slate-900 rounded-xl border border-slate-700 text-white shadow-inner">
-                <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-800">
-                  <span class="text-xs font-bold text-emerald-400 flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    กล้องกำลังทำงาน: นำ Barcode หรือ QR Code ส่องตรงกลางกรอบ
-                  </span>
-                  <button type="button" onclick="stopCameraScanner('pack')" class="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-white transition">
-                    <i class="fa-solid fa-xmark mr-1"></i> ปิดกล้อง
+              <div id="packCameraBox" class="hidden p-3.5 sm:p-5 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 rounded-2xl border border-slate-700/80 text-white shadow-2xl space-y-3">
+                <!-- Top Bar: Status, Resolution/FPS & Close -->
+                <div class="flex items-center justify-between pb-2.5 border-b border-slate-800/80">
+                  <div class="flex items-center gap-2">
+                    <span class="relative flex h-3 w-3">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                    </span>
+                    <div>
+                      <span class="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5">
+                        <span>สแกนเนอร์กล้องสดความเร็วสูง</span>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-500/40 font-semibold">25 FPS • HD</span>
+                      </span>
+                      <p class="text-[11px] text-slate-400 hidden sm:block">สแกนได้ทั้ง Barcode 1D (Code 128 / 39) และ QR Code 2D ในทุกมุมมอง</p>
+                    </div>
+                  </div>
+                  <button type="button" onclick="stopCameraScanner('pack')" class="text-xs bg-slate-800 hover:bg-rose-900/60 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                    <span>ปิดกล้อง</span>
                   </button>
                 </div>
-                <div id="packQrReader" class="overflow-hidden rounded-lg bg-black" style="min-height: 220px;"></div>
-                <div class="flex justify-between items-center mt-2.5 text-xs text-slate-300 gap-2 flex-wrap">
-                  <div class="flex items-center gap-1.5">
-                    <span class="text-slate-400">เลือกกล้อง:</span>
-                    <select id="packCameraSelect" onchange="switchCameraDevice('pack')" class="bg-slate-800 text-xs px-2.5 py-1 rounded text-white border border-slate-700 outline-none"></select>
+
+                <!-- Viewfinder Frame with Laser & Corner Brackets -->
+                <div class="relative scanner-container group">
+                  <!-- Auto-Light Floating Badge (Real-time Lighting Detection) -->
+                  <div id="packAutoLightBadge" class="hidden autolight-pill bg-amber-500/95 text-slate-950 text-[11px] font-bold px-3 py-1 rounded-full shadow-lg border border-amber-300 flex items-center gap-1.5 animate-pulse">
+                    <i class="fa-solid fa-lightbulb text-xs"></i>
+                    <span id="packAutoLightBadgeText">💡 ปรับแสงอัตโนมัติ (Low-Light Enhanced)</span>
                   </div>
-                  <div class="flex items-center bg-slate-800/90 px-2 py-1 rounded-lg border border-amber-500/60 shadow-sm">
-                    <label for="cameraRackInput" class="text-[11px] text-amber-300 mr-1.5 font-bold flex items-center gap-1 cursor-pointer">
-                      <i class="fa-solid fa-warehouse text-amber-400"></i>
-                      <span>Rack No.:</span>
-                    </label>
-                    <input type="text" id="cameraRackInput" value="364" class="w-14 bg-slate-900 text-yellow-300 font-mono font-bold px-1.5 py-0.5 rounded border border-slate-600 text-center text-xs outline-none uppercase" placeholder="364" onchange="saveLastRack(this.value)" oninput="saveLastRack(this.value)">
+
+                  <!-- Targeting Corner Brackets -->
+                  <div class="scanner-reticle-corner scanner-reticle-tl"></div>
+                  <div class="scanner-reticle-corner scanner-reticle-tr"></div>
+                  <div class="scanner-reticle-corner scanner-reticle-bl"></div>
+                  <div class="scanner-reticle-corner scanner-reticle-br"></div>
+
+                  <!-- Animated Scanning Laser Line -->
+                  <div class="scanner-laser-line"></div>
+
+                  <!-- Underlying Html5Qrcode video holder -->
+                  <div id="packQrReader" class="w-full overflow-hidden rounded-xl bg-black" style="min-height: 240px;"></div>
+                </div>
+
+                <!-- Viewfinder Controls & Low-Light Actions -->
+                <div class="flex items-center justify-between gap-2 flex-wrap pt-1 text-xs">
+                  <!-- Left: Flashlight / Torch & Auto-Light Switch -->
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <!-- Flashlight / Torch Toggle -->
+                    <button type="button" id="packTorchBtn" onclick="toggleTorch('pack')"
+                            class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-lg font-bold border border-amber-500/40 transition flex items-center gap-1.5 shadow-sm cursor-pointer"
+                            title="เปิด/ปิดไฟฉายส่องชิ้นงานในที่มืด">
+                      <i class="fa-solid fa-bolt" id="packTorchIcon"></i>
+                      <span id="packTorchTxt">เปิดไฟฉาย</span>
+                    </button>
+
+                    <!-- Auto-Light Mode Toggle -->
+                    <button type="button" id="packAutoLightBtn" onclick="toggleAutoLightMode('pack')"
+                            class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-emerald-300 rounded-lg font-semibold border border-emerald-500/40 transition flex items-center gap-1.5 shadow-sm cursor-pointer"
+                            title="ระบบตรวจจับแสงน้อยอัตโนมัติ: เร่งความสว่างและคอนทราสต์เพื่อให้อ่าน QR ได้ทันทีแม้อยู่ในมุมมืด">
+                      <i class="fa-solid fa-wand-magic-sparkles text-emerald-400"></i>
+                      <span id="packAutoLightTxt">Auto-Light: เปิด</span>
+                    </button>
+
+                    <!-- Ambient Lux Meter Display -->
+                    <span id="packLuxMeter" class="text-[11px] font-mono text-slate-400 px-2 py-1 rounded bg-slate-800/60 border border-slate-700/60 flex items-center gap-1" title="ระดับความสว่างหน้ากล้องแบบเรียลไทม์ (0-255)">
+                      <i class="fa-regular fa-sun text-amber-400 text-[10px]"></i>
+                      <span id="packLuxVal">แสง: --</span>
+                    </span>
+                  </div>
+
+                  <!-- Right: Camera Switcher & Rack No. -->
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-slate-400 text-[11px]">กล้อง:</span>
+                      <select id="packCameraSelect" onchange="switchCameraDevice('pack')" class="bg-slate-800 text-xs px-2.5 py-1.5 rounded-lg text-white border border-slate-700 outline-none cursor-pointer max-w-[150px] truncate"></select>
+                    </div>
+
+                    <div class="flex items-center bg-slate-800/90 px-2 py-1 rounded-lg border border-amber-500/60 shadow-sm">
+                      <label for="cameraRackInput" class="text-[11px] text-amber-300 mr-1.5 font-bold flex items-center gap-1 cursor-pointer">
+                        <i class="fa-solid fa-warehouse text-amber-400"></i>
+                        <span>Rack:</span>
+                      </label>
+                      <input type="text" id="cameraRackInput" value="364" class="w-14 bg-slate-900 text-yellow-300 font-mono font-bold px-1.5 py-0.5 rounded border border-slate-600 text-center text-xs outline-none uppercase" placeholder="364" onchange="saveLastRack(this.value)" oninput="saveLastRack(this.value)">
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1585,20 +1797,81 @@
               </div>
 
               <!-- Camera Viewfinder Box (Collapsible) -->
-              <div id="receiveCameraBox" class="hidden p-3 sm:p-4 bg-slate-900 rounded-xl border border-slate-700 text-white shadow-inner">
-                <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-800">
-                  <span class="text-xs font-bold text-emerald-400 flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    กล้องกำลังทำงาน: นำ QR Code ส่องตรงกลางกรอบ
-                  </span>
-                  <button type="button" onclick="stopCameraScanner('receive')" class="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-white transition">
-                    <i class="fa-solid fa-xmark mr-1"></i> ปิดกล้อง
+              <div id="receiveCameraBox" class="hidden p-3.5 sm:p-5 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 rounded-2xl border border-slate-700/80 text-white shadow-2xl space-y-3">
+                <!-- Top Bar: Status, Resolution/FPS & Close -->
+                <div class="flex items-center justify-between pb-2.5 border-b border-slate-800/80">
+                  <div class="flex items-center gap-2">
+                    <span class="relative flex h-3 w-3">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                    </span>
+                    <div>
+                      <span class="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5">
+                        <span>สแกนเนอร์กล้องสดรับเข้า (Tag รูปที่ 1)</span>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-500/40 font-semibold">25 FPS • HD</span>
+                      </span>
+                      <p class="text-[11px] text-slate-400 hidden sm:block">ส่อง QR Code หรือบาร์โค้ดตรงกลางกรอบ ระบบจะอ่านและบันทึกยอดรับเข้าทันที</p>
+                    </div>
+                  </div>
+                  <button type="button" onclick="stopCameraScanner('receive')" class="text-xs bg-slate-800 hover:bg-rose-900/60 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                    <span>ปิดกล้อง</span>
                   </button>
                 </div>
-                <div id="receiveQrReader" class="overflow-hidden rounded-lg bg-black" style="min-height: 220px;"></div>
-                <div class="flex justify-between items-center mt-2.5 text-xs text-slate-400">
-                  <span>เลือกกล้อง:</span>
-                  <select id="receiveCameraSelect" onchange="switchCameraDevice('receive')" class="bg-slate-800 text-xs px-2.5 py-1 rounded text-white border border-slate-700 outline-none"></select>
+
+                <!-- Viewfinder Frame with Laser & Corner Brackets -->
+                <div class="relative scanner-container group">
+                  <!-- Auto-Light Floating Badge (Real-time Lighting Detection) -->
+                  <div id="receiveAutoLightBadge" class="hidden autolight-pill bg-amber-500/95 text-slate-950 text-[11px] font-bold px-3 py-1 rounded-full shadow-lg border border-amber-300 flex items-center gap-1.5 animate-pulse">
+                    <i class="fa-solid fa-lightbulb text-xs"></i>
+                    <span id="receiveAutoLightBadgeText">💡 ปรับแสงอัตโนมัติ (Low-Light Enhanced)</span>
+                  </div>
+
+                  <!-- Targeting Corner Brackets -->
+                  <div class="scanner-reticle-corner scanner-reticle-tl"></div>
+                  <div class="scanner-reticle-corner scanner-reticle-tr"></div>
+                  <div class="scanner-reticle-corner scanner-reticle-bl"></div>
+                  <div class="scanner-reticle-corner scanner-reticle-br"></div>
+
+                  <!-- Animated Scanning Laser Line -->
+                  <div class="scanner-laser-line"></div>
+
+                  <!-- Underlying Html5Qrcode video holder -->
+                  <div id="receiveQrReader" class="w-full overflow-hidden rounded-xl bg-black" style="min-height: 240px;"></div>
+                </div>
+
+                <!-- Viewfinder Controls & Low-Light Actions -->
+                <div class="flex items-center justify-between gap-2 flex-wrap pt-1 text-xs">
+                  <!-- Left: Flashlight / Torch & Auto-Light Switch -->
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <!-- Flashlight / Torch Toggle -->
+                    <button type="button" id="receiveTorchBtn" onclick="toggleTorch('receive')"
+                            class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-lg font-bold border border-amber-500/40 transition flex items-center gap-1.5 shadow-sm cursor-pointer"
+                            title="เปิด/ปิดไฟฉายส่องชิ้นงานในที่มืด">
+                      <i class="fa-solid fa-bolt" id="receiveTorchIcon"></i>
+                      <span id="receiveTorchTxt">เปิดไฟฉาย</span>
+                    </button>
+
+                    <!-- Auto-Light Mode Toggle -->
+                    <button type="button" id="receiveAutoLightBtn" onclick="toggleAutoLightMode('receive')"
+                            class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-emerald-300 rounded-lg font-semibold border border-emerald-500/40 transition flex items-center gap-1.5 shadow-sm cursor-pointer"
+                            title="ระบบตรวจจับแสงน้อยอัตโนมัติ">
+                      <i class="fa-solid fa-wand-magic-sparkles text-emerald-400"></i>
+                      <span id="receiveAutoLightTxt">Auto-Light: เปิด</span>
+                    </button>
+
+                    <!-- Ambient Lux Meter Display -->
+                    <span id="receiveLuxMeter" class="text-[11px] font-mono text-slate-400 px-2 py-1 rounded bg-slate-800/60 border border-slate-700/60 flex items-center gap-1" title="ระดับความสว่างหน้ากล้องแบบเรียลไทม์ (0-255)">
+                      <i class="fa-regular fa-sun text-amber-400 text-[10px]"></i>
+                      <span id="receiveLuxVal">แสง: --</span>
+                    </span>
+                  </div>
+
+                  <!-- Right: Camera Switcher -->
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-slate-400 text-[11px]">กล้อง:</span>
+                    <select id="receiveCameraSelect" onchange="switchCameraDevice('receive')" class="bg-slate-800 text-xs px-2.5 py-1.5 rounded-lg text-white border border-slate-700 outline-none cursor-pointer max-w-[180px] truncate"></select>
+                  </div>
                 </div>
               </div>
 
@@ -4989,8 +5262,30 @@
       renderBalanceTable(filtered);
     }
 
-    // Camera QR & Barcode Scanner Controller (Html5Qrcode & Native Camera)
+    // Camera QR & Barcode Scanner Controller (Html5Qrcode, Torch & Auto-Light Low-Light Optimizer)
     let html5QrCodeScanners = {};
+    let scannerTorchState = {
+      pack: {
+        hasTorch: false,
+        isTorchOn: false,
+        autoLightEnabled: true,
+        manualTorchHold: false,
+        monitorTimer: null,
+        track: null,
+        lastScannedText: '',
+        lastScannedTime: 0
+      },
+      receive: {
+        hasTorch: false,
+        isTorchOn: false,
+        autoLightEnabled: true,
+        manualTorchHold: false,
+        monitorTimer: null,
+        track: null,
+        lastScannedText: '',
+        lastScannedTime: 0
+      }
+    };
 
     function triggerNativeCamera(mode) {
       const input = document.getElementById(mode + 'NativeCameraInput');
@@ -5107,11 +5402,27 @@
       if (scanner.isScanning) {
         try { await scanner.stop(); } catch (e) {}
       }
+
+      // Stop previous lighting monitors
+      if (scannerTorchState[mode].monitorTimer) {
+        clearInterval(scannerTorchState[mode].monitorTimer);
+        scannerTorchState[mode].monitorTimer = null;
+      }
+
+      // Dynamic responsive viewfinder sizing for 1D wide barcode + 2D QR code
       const config = {
-        fps: 15,
-        qrbox: { width: 280, height: 250 },
-        aspectRatio: 1.3333
+        fps: 25,
+        qrbox: function(viewfinderWidth, viewfinderHeight) {
+          const w = Math.min(Math.floor(viewfinderWidth * 0.88), 480);
+          const h = Math.min(Math.floor(viewfinderHeight * 0.72), 320);
+          return { width: Math.max(w, 240), height: Math.max(h, 200) };
+        },
+        aspectRatio: 1.3333,
+        experimentalFeatures: {
+          useBarCodeDetectorIfSupported: true
+        }
       };
+
       await scanner.start(
         cameraConfig,
         config,
@@ -5122,6 +5433,182 @@
           // Frame errors during scan can be ignored
         }
       );
+
+      // Initialize hardware torch detection & ambient lighting monitor
+      setTimeout(() => {
+        initCameraTrackAndTorch(mode);
+      }, 350);
+    }
+
+    function initCameraTrackAndTorch(mode) {
+      const videoElem = document.querySelector(`#${mode}QrReader video`);
+      if (!videoElem) return;
+
+      const stream = videoElem.srcObject;
+      if (!stream) return;
+
+      const track = stream.getVideoTracks()[0];
+      if (!track) return;
+
+      const state = scannerTorchState[mode];
+      state.track = track;
+
+      let hasTorch = false;
+      try {
+        const caps = (track.getCapabilities && typeof track.getCapabilities === 'function') ? track.getCapabilities() : {};
+        hasTorch = Boolean(caps.torch);
+      } catch (e) {
+        console.warn('Torch detection check:', e);
+      }
+      state.hasTorch = hasTorch;
+      state.isTorchOn = false;
+      state.manualTorchHold = false;
+
+      updateTorchButtonUi(mode, false);
+      startAmbientLightingMonitor(mode);
+    }
+
+    function updateTorchButtonUi(mode, isOn) {
+      const btn = document.getElementById(`${mode}TorchBtn`);
+      const txt = document.getElementById(`${mode}TorchTxt`);
+      const icon = document.getElementById(`${mode}TorchIcon`);
+      if (!btn || !txt) return;
+
+      if (isOn) {
+        btn.className = "px-2.5 py-1.5 bg-amber-500 text-slate-950 font-black rounded-lg border border-amber-300 transition flex items-center gap-1.5 shadow-lg shadow-amber-500/30 cursor-pointer animate-pulse";
+        txt.innerText = "💡 ปิดไฟฉาย";
+        if (icon) icon.className = "fa-solid fa-lightbulb text-slate-950";
+      } else {
+        btn.className = "px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-lg font-bold border border-amber-500/40 transition flex items-center gap-1.5 shadow-sm cursor-pointer";
+        txt.innerText = scannerTorchState[mode].hasTorch ? "⚡ เปิดไฟฉาย" : "💡 เร่งแสงกล้อง";
+        if (icon) icon.className = "fa-solid fa-bolt";
+      }
+    }
+
+    async function toggleTorch(mode) {
+      const state = scannerTorchState[mode];
+      state.manualTorchHold = true;
+      state.isTorchOn = !state.isTorchOn;
+
+      if (state.hasTorch && state.track) {
+        try {
+          await state.track.applyConstraints({ advanced: [{ torch: state.isTorchOn }] });
+        } catch (err) {
+          console.warn('Torch toggle constraint:', err);
+        }
+      }
+
+      const video = document.querySelector(`#${mode}QrReader video`);
+      if (video) {
+        video.style.filter = state.isTorchOn ? 'brightness(1.5) contrast(1.4) saturate(1.1)' : 'none';
+      }
+      updateTorchButtonUi(mode, state.isTorchOn);
+    }
+
+    function toggleAutoLightMode(mode) {
+      const state = scannerTorchState[mode];
+      state.autoLightEnabled = !state.autoLightEnabled;
+      state.manualTorchHold = false;
+
+      const txt = document.getElementById(`${mode}AutoLightTxt`);
+      const btn = document.getElementById(`${mode}AutoLightBtn`);
+      if (txt) txt.innerText = state.autoLightEnabled ? "Auto-Light: เปิด" : "Auto-Light: ปิด";
+      if (btn) {
+        btn.className = state.autoLightEnabled
+          ? "px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-emerald-300 rounded-lg font-semibold border border-emerald-500/40 transition flex items-center gap-1.5 shadow-sm cursor-pointer"
+          : "px-2.5 py-1.5 bg-slate-800/60 text-slate-500 rounded-lg font-semibold border border-slate-700 transition flex items-center gap-1.5 shadow-sm cursor-pointer";
+      }
+
+      const badge = document.getElementById(`${mode}AutoLightBadge`);
+      if (!state.autoLightEnabled && badge) {
+        badge.classList.add('hidden');
+      }
+    }
+
+    function startAmbientLightingMonitor(mode) {
+      const state = scannerTorchState[mode];
+      if (state.monitorTimer) {
+        clearInterval(state.monitorTimer);
+        state.monitorTimer = null;
+      }
+
+      const sampleCanvas = document.createElement('canvas');
+      sampleCanvas.width = 48;
+      sampleCanvas.height = 48;
+      const sampleCtx = sampleCanvas.getContext('2d', { willReadFrequently: true });
+
+      let darkFrames = 0;
+      let brightFrames = 0;
+
+      state.monitorTimer = setInterval(async () => {
+        const video = document.querySelector(`#${mode}QrReader video`);
+        if (!video || video.readyState < 2 || !state.track) return;
+
+        try {
+          sampleCtx.drawImage(video, 0, 0, 48, 48);
+          const img = sampleCtx.getImageData(0, 0, 48, 48);
+          const d = img.data;
+          let lumSum = 0;
+          const total = d.length;
+          for (let i = 0; i < total; i += 4) {
+            lumSum += 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+          }
+          const avgLum = Math.round(lumSum / (total / 4));
+
+          const luxVal = document.getElementById(`${mode}LuxVal`);
+          if (luxVal) {
+            luxVal.innerText = `แสง: ${avgLum}/255`;
+            luxVal.className = avgLum < 55 ? "text-amber-400 font-bold" : (avgLum > 180 ? "text-sky-300 font-medium" : "text-emerald-400 font-medium");
+          }
+
+          const badge = document.getElementById(`${mode}AutoLightBadge`);
+          const badgeText = document.getElementById(`${mode}AutoLightBadgeText`);
+
+          if (state.autoLightEnabled && !state.manualTorchHold) {
+            if (avgLum < 55) {
+              darkFrames++;
+              brightFrames = 0;
+              if (darkFrames >= 2) {
+                if (badge) badge.classList.remove('hidden');
+                if (badgeText) badgeText.innerText = `💡 สภาพแสงมืด (${avgLum}/255) • ปรับแสง & คอนทราสต์อัตโนมัติ`;
+
+                // Auto torch activation if supported
+                if (state.hasTorch && !state.isTorchOn) {
+                  try {
+                    await state.track.applyConstraints({ advanced: [{ torch: true }] });
+                    state.isTorchOn = true;
+                    updateTorchButtonUi(mode, true);
+                  } catch (e) {
+                    console.warn('Auto torch apply:', e);
+                  }
+                }
+                // Software ISP Contrast / Brightness Boost
+                video.style.filter = 'brightness(1.45) contrast(1.4) saturate(1.15)';
+              }
+            } else if (avgLum > 80) {
+              brightFrames++;
+              darkFrames = 0;
+              if (brightFrames >= 4) {
+                if (badge) badge.classList.add('hidden');
+                video.style.filter = 'none';
+
+                // Auto torch off
+                if (state.hasTorch && state.isTorchOn) {
+                  try {
+                    await state.track.applyConstraints({ advanced: [{ torch: false }] });
+                    state.isTorchOn = false;
+                    updateTorchButtonUi(mode, false);
+                  } catch (e) {
+                    console.warn('Auto torch off:', e);
+                  }
+                }
+              }
+            }
+          }
+        } catch (err) {
+          // Ignore sampling errors
+        }
+      }, 400);
     }
 
     async function switchCameraDevice(mode) {
@@ -5135,6 +5622,29 @@
     async function stopCameraScanner(mode) {
       const box = document.getElementById(mode + 'CameraBox');
       if (box) box.classList.add('hidden');
+
+      const state = scannerTorchState[mode];
+      if (state.monitorTimer) {
+        clearInterval(state.monitorTimer);
+        state.monitorTimer = null;
+      }
+
+      if (state.track && state.isTorchOn) {
+        try {
+          await state.track.applyConstraints({ advanced: [{ torch: false }] });
+        } catch (e) {}
+      }
+      state.isTorchOn = false;
+      state.manualTorchHold = false;
+
+      const video = document.querySelector(`#${mode}QrReader video`);
+      if (video) video.style.filter = 'none';
+
+      const badge = document.getElementById(`${mode}AutoLightBadge`);
+      if (badge) badge.classList.add('hidden');
+
+      updateTorchButtonUi(mode, false);
+
       if (html5QrCodeScanners[mode]) {
         try {
           if (html5QrCodeScanners[mode].isScanning) {
@@ -5147,6 +5657,16 @@
     }
 
     function onScanSuccess(decodedText, decodedResult, mode) {
+      const now = Date.now();
+      const st = scannerTorchState[mode];
+      if (st && st.lastScannedText === decodedText && (now - st.lastScannedTime) < 1200) {
+        return; // Debounce rapid consecutive scans of identical barcode
+      }
+      if (st) {
+        st.lastScannedText = decodedText;
+        st.lastScannedTime = now;
+      }
+
       playBeep('pass');
       console.log(`[QR Scan (${mode})]:`, decodedText);
 

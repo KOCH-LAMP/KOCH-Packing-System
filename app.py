@@ -107,6 +107,20 @@ def presentation_route():
     return resp
 
 
+@app.route("/video")
+@app.route("/presentation_video")
+def presentation_video_route():
+    return render_template("presentation_video.html")
+
+
+@app.route("/download/presentation_video")
+def download_presentation_video():
+    video_path = os.path.join(BASE_DIR, "KOCH_LAMP_System_Presentation.mp4")
+    if not os.path.exists(video_path):
+        video_path = os.path.join(BASE_DIR, "static", "KOCH_LAMP_System_Presentation.mp4")
+    return send_file(video_path, as_attachment=True, download_name="KOCH_LAMP_System_Presentation.mp4")
+
+
 @app.route("/api/balance", methods=["GET"])
 def get_balance():
     po_param = request.args.get("po_no")
